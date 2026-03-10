@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daltons AI — Automated AI Business Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --navy:       #0F172A;
+  --navy2:      #1E293B;
+  --navy3:      #334155;
+  --amber:      #F59E0B;
+  --amber2:     #FBBF24;
+  --amber-pale: #FFFBEB;
+  --blue:       #2563EB;
+  --blue-pale:  #EFF6FF;
+  --white:      #FFFFFF;
+  --slate50:    #F8FAFC;
+  --slate100:   #F1F5F9;
+  --slate200:   #E2E8F0;
+  --slate300:   #CBD5E1;
+  --slate400:   #94A3B8;
+  --slate500:   #64748B;
+  --slate600:   #475569;
+  --slate700:   #334155;
+  --green:      #10B981;
+  --green-pale: #ECFDF5;
+  --red:        #EF4444;
+  --red-pale:   #FEF2F2;
+  --orange:     #F97316;
+  --serif:      'Instrument Serif', Georgia, serif;
+  --sans:       'DM Sans', system-ui, sans-serif;
+  --mono:       'JetBrains Mono', monospace;
+  --shadow-sm:  0 1px 2px rgba(15,23,42,.06);
+  --shadow:     0 1px 3px rgba(15,23,42,.08), 0 4px 16px rgba(15,23,42,.04);
+  --shadow-md:  0 4px 24px rgba(15,23,42,.10);
+  --shadow-lg:  0 16px 48px rgba(15,23,42,.14);
+  --r:          10px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--white); color: var(--navy); -webkit-font-smoothing: antialiased; }
+button { cursor: pointer; font-family: var(--sans); }
+input, textarea, select { font-family: var(--sans); }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: var(--slate200); border-radius: 4px; }
+a { text-decoration: none; color: inherit; }
+
+/* ═══════════════════════════════════════════
+   VIEWS
+═══════════════════════════════════════════ */
+.view { display: none; }
+.view.on { display: block; }
+#landing.on { display: flex; flex-direction: column; min-height: 100vh; }
+#admin.on, #client.on { display: flex; height: 100vh; overflow: hidden; }
+
+/* ═══════════════════════════════════════════
+   SHARED COMPONENTS
+═══════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 14px; font-weight: 600; border-radius: 8px;
+  padding: 10px 20px; border: none; transition: all .18s;
+  white-space: nowrap; cursor: pointer;
+}
+.btn-navy  { background: var(--navy); color: #fff; }
+.btn-navy:hover  { background: var(--navy2); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-amber { background: var(--amber); color: var(--navy); }
+.btn-amber:hover { background: var(--amber2); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245,158,11,.35); }
+.btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--slate200); }
+.btn-outline:hover { border-color: var(--navy); background: var(--slate50); }
+.btn-ghost  { background: transparent; color: var(--slate500); border: none; }
+.btn-ghost:hover  { color: var(--navy); background: var(--slate100); }
+.btn-sm { font-size: 12px; padding: 6px 14px; border-radius: 6px; }
+.btn-lg { font-size: 15px; padding: 14px 28px; border-radius: 10px; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; letter-spacing: .5px;
+  padding: 3px 10px; border-radius: 20px;
+}
+.pill-green  { background: var(--green-pale); color: var(--green); }
+.pill-amber  { background: var(--amber-pale); color: var(--orange); }
+.pill-blue   { background: var(--blue-pale); color: var(--blue); }
+.pill-slate  { background: var(--slate100); color: var(--slate500); }
+.pill-red    { background: var(--red-pale); color: var(--red); }
+.pill-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.card {
+  background: var(--white); border: 1px solid var(--slate200);
+  border-radius: var(--r); overflow: hidden;
+}
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--slate100);
+}
+.card-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+.card-body  { padding: 20px; }
+
+.metric {
+  background: var(--white); border: 1px solid var(--slate200);
+  border-radius: var(--r); padding: 20px; transition: box-shadow .2s;
+}
+.metric:hover { box-shadow: var(--shadow); }
+.metric-label { font-size: 11px; font-weight: 600; color: var(--slate400); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 10px; }
+.metric-val   { font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; margin-bottom: 6px; font-family: var(--sans); }
+.metric-sub   { font-size: 12px; color: var(--slate400); }
+.metric-sub.up   { color: var(--green); }
+.metric-sub.down { color: var(--red); }
+
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* TABLE */
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th { font-size: 11px; font-weight: 600; color: var(--slate400); letter-spacing: .5px; text-transform: uppercase; padding: 10px 16px; background: var(--slate50); border-bottom: 1px solid var(--slate200); text-align: left; }
+.tbl td { padding: 12px 16px; font-size: 13px; color: var(--slate600); border-bottom: 1px solid var(--slate100); }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--slate50); }
+.tbl td strong { color: var(--navy); }
+
+/* PROGRESS */
+.progress-wrap { margin-top: 8px; }
+.progress-row  { display: flex; justify-content: space-between; font-size: 11px; color: var(--slate400); margin-bottom: 4px; }
+.progress-track { height: 5px; background: var(--slate100); border-radius: 3px; }
+.progress-fill  { height: 5px; border-radius: 3px; background: linear-gradient(90deg, var(--blue), #60A5FA); transition: width .6s; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(15,23,42,.5); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.off { display: none; }
+.modal-box {
+  background: var(--white); border-radius: 14px;
+  box-shadow: var(--shadow-lg); width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  animation: modalIn .22s ease;
+}
+@keyframes modalIn { from { opacity:0; transform: scale(.96) translateY(8px); } to { opacity:1; transform: none; } }
+.modal-head { padding: 28px 28px 0; }
+.modal-title { font-family: var(--serif); font-size: 26px; color: var(--navy); margin-bottom: 6px; }
+.modal-sub   { font-size: 13px; color: var(--slate500); line-height: 1.7; }
+.modal-body  { padding: 24px 28px; }
+.modal-foot  { padding: 0 28px 24px; display: flex; gap: 10px; }
+
+/* FORM */
+.f-label { display: block; font-size: 12px; font-weight: 600; color: var(--slate600); margin-bottom: 5px; letter-spacing: .3px; }
+.f-input {
+  width: 100%; background: var(--slate50); border: 1.5px solid var(--slate200);
+  border-radius: 8px; padding: 10px 14px; font-size: 14px; color: var(--navy);
+  outline: none; transition: border-color .15s; margin-bottom: 14px;
+}
+.f-input:focus { border-color: var(--blue); background: var(--white); }
+.f-input.err   { border-color: var(--red); }
+.f-select {
+  width: 100%; background: var(--slate50); border: 1.5px solid var(--slate200);
+  border-radius: 8px; padding: 10px 14px; font-size: 14px; color: var(--navy);
+  outline: none; margin-bottom: 14px; cursor: pointer;
+}
+
+/* TOAST */
+#toast {
+  position: fixed; top: 20px; right: 20px; z-index: 3000;
+  background: var(--navy); color: #fff; padding: 13px 20px;
+  border-radius: 10px; font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px;
+  transform: translateY(-80px); opacity: 0; transition: all .28s;
+  max-width: 340px; pointer-events: none;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   LANDING — NAV
+═══════════════════════════════════════════ */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--slate200);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 60px; height: 66px; flex-shrink: 0;
+}
+.nav-logo {
+  font-family: var(--serif); font-size: 22px; color: var(--navy);
+  display: flex; align-items: center; gap: 10px;
+}
+.nav-logo-dot { width: 8px; height: 8px; background: var(--amber); border-radius: 50%; }
+.nav-links { display: flex; gap: 8px; }
+.nav-link { font-size: 14px; color: var(--slate500); font-weight: 500; padding: 6px 14px; border-radius: 6px; transition: all .15s; }
+.nav-link:hover { color: var(--navy); background: var(--slate100); }
+.nav-actions { display: flex; gap: 10px; align-items: center; }
+
+/* ═══════════════════════════════════════════
+   LANDING — HERO
+═══════════════════════════════════════════ */
+.hero {
+  background: var(--navy);
+  padding: 100px 60px 90px;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 800px 500px at 20% 60%, rgba(245,158,11,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 80% 20%, rgba(37,99,235,.12) 0%, transparent 60%);
+}
+.hero-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+.hero-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid rgba(255,255,255,.12); padding: 6px 14px;
+  border-radius: 20px; font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,.65); letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.hero-live-dot { width: 6px; height: 6px; background: #4ADE80; border-radius: 50%; animation: live 2s infinite; }
+@keyframes live { 0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.5)} 50%{box-shadow:0 0 0 6px transparent} }
+.hero-h1 {
+  font-family: var(--serif); font-size: 68px; color: #fff;
+  line-height: 1.06; letter-spacing: -.5px; margin-bottom: 22px;
+  max-width: 760px;
+}
+.hero-h1 em { color: var(--amber); font-style: italic; }
+.hero-p {
+  font-size: 17px; color: rgba(255,255,255,.55); line-height: 1.8;
+  max-width: 520px; margin-bottom: 38px;
+}
+.hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-stats {
+  display: flex; gap: 0;
+  margin-top: 72px; padding-top: 40px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.hero-stat { padding: 0 48px 0 0; }
+.hero-stat-n { font-size: 36px; font-weight: 700; color: #fff; line-height: 1; }
+.hero-stat-n span { color: var(--amber); }
+.hero-stat-l { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 4px; letter-spacing: .5px; }
+
+/* ═══════════════════════════════════════════
+   LANDING — SECTIONS
+═══════════════════════════════════════════ */
+.section { padding: 90px 60px; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
+.section-h2 { font-family: var(--serif); font-size: 44px; color: var(--navy); line-height: 1.1; margin-bottom: 14px; }
+.section-h2 em { color: var(--amber); font-style: italic; }
+.section-p { font-size: 16px; color: var(--slate500); line-height: 1.8; max-width: 540px; margin-bottom: 52px; }
+
+/* SERVICES */
+.services-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+.svc {
+  background: var(--white); border: 1px solid var(--slate200);
+  border-radius: 12px; padding: 26px; transition: all .2s; position: relative;
+}
+.svc::after {
+  content: ''; position: absolute; inset: 0; border-radius: 12px;
+  border: 1.5px solid var(--amber); opacity: 0; transition: opacity .2s; pointer-events: none;
+}
+.svc:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.svc:hover::after { opacity: 1; }
+.svc-icon { font-size: 28px; margin-bottom: 14px; }
+.svc h3 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.svc p  { font-size: 13px; color: var(--slate500); line-height: 1.65; margin-bottom: 16px; }
+.svc-price { font-size: 22px; font-weight: 700; color: var(--navy); }
+.svc-price span { font-size: 13px; font-weight: 400; color: var(--slate400); }
+.svc-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-bottom: 10px; }
+
+/* LEAD TABLE */
+.leads-wrap { border: 1px solid var(--slate200); border-radius: 12px; overflow: hidden; }
+.leads-head { background: var(--navy); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+.leads-head h4 { font-size: 14px; font-weight: 600; color: #fff; }
+.leads-head span { font-size: 12px; color: rgba(255,255,255,.45); }
+.lead-row { display: grid; grid-template-columns: 2fr 1.2fr .8fr .8fr 110px; border-bottom: 1px solid var(--slate100); align-items: center; }
+.lead-row:last-child { border-bottom: none; }
+.lead-row.thead { background: var(--slate50); }
+.lead-cell { padding: 13px 16px; font-size: 13px; color: var(--slate600); }
+.lead-cell small { display: block; font-size: 11px; color: var(--slate400); margin-top: 1px; }
+.lead-cell.thead-cell { font-size: 10px; font-weight: 700; color: var(--slate400); letter-spacing: .5px; text-transform: uppercase; }
+.buy-btn {
+  background: var(--navy); color: #fff; border: none; border-radius: 6px;
+  padding: 6px 14px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.buy-btn:hover { background: var(--amber); color: var(--navy); transform: scale(1.04); }
+
+/* PRICING */
+.pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+.plan {
+  background: var(--white); border: 1.5px solid var(--slate200);
+  border-radius: 14px; padding: 36px; transition: all .2s; position: relative;
+}
+.plan.featured {
+  background: var(--navy); border-color: var(--navy);
+  transform: scale(1.03); box-shadow: var(--shadow-lg);
+}
+.plan-badge {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  background: var(--amber); color: var(--navy);
+  font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
+  padding: 4px 16px; border-radius: 20px; white-space: nowrap;
+}
+.plan-name { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+.plan.featured .plan-name { color: var(--amber); }
+.plan-price { font-family: var(--serif); font-size: 52px; color: var(--navy); line-height: 1; margin-bottom: 6px; }
+.plan.featured .plan-price { color: #fff; }
+.plan-price sub { font-family: var(--sans); font-size: 15px; font-weight: 400; color: var(--slate400); vertical-align: bottom; }
+.plan.featured .plan-price sub { color: rgba(255,255,255,.5); }
+.plan-period { font-size: 12px; color: var(--slate400); margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--slate200); }
+.plan.featured .plan-period { color: rgba(255,255,255,.45); border-bottom-color: rgba(255,255,255,.1); }
+.plan-feature {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: var(--slate600); padding: 7px 0;
+  border-bottom: 1px solid var(--slate100);
+}
+.plan.featured .plan-feature { color: rgba(255,255,255,.75); border-bottom-color: rgba(255,255,255,.08); }
+.plan-feature:last-of-type { border-bottom: none; }
+.plan-check { width: 18px; height: 18px; background: var(--green-pale); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; margin-top: 1px; }
+.plan.featured .plan-check { background: rgba(16,185,129,.2); color: #6EE7B7; }
+.plan-btn { width: 100%; margin-top: 24px; padding: 13px; border-radius: 8px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; transition: all .18s; }
+.plan-btn-outline { background: transparent; border: 1.5px solid var(--slate200); color: var(--navy); }
+.plan-btn-outline:hover { border-color: var(--navy); background: var(--slate50); }
+.plan-btn-amber { background: var(--amber); color: var(--navy); }
+.plan-btn-amber:hover { background: var(--amber2); box-shadow: 0 4px 16px rgba(245,158,11,.35); }
+
+/* FOOTER */
+.footer { background: var(--navy); padding: 64px 60px 32px; }
+.footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
+.footer-logo { font-family: var(--serif); font-size: 22px; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.footer-logo-dot { width: 8px; height: 8px; background: var(--amber); border-radius: 50%; }
+.footer-p { font-size: 13px; color: rgba(255,255,255,.4); line-height: 1.8; }
+.footer-col h5 { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 16px; }
+.footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 8px; transition: color .15s; }
+.footer-col a:hover { color: #fff; }
+.footer-bottom { max-width: 1100px; margin: 48px auto 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.08); display: flex; justify-content: space-between; align-items: center; }
+.footer-bottom p { font-size: 12px; color: rgba(255,255,255,.3); }
+
+/* ═══════════════════════════════════════════
+   DASHBOARD CHROME
+═══════════════════════════════════════════ */
+.dash-sidebar {
+  width: 232px; flex-shrink: 0;
+  background: var(--navy); display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.dash-sidebar::-webkit-scrollbar { width: 0; }
+.sb-logo { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.sb-logo-name { font-family: var(--serif); font-size: 19px; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sb-logo-dot { width: 7px; height: 7px; background: var(--amber); border-radius: 50%; }
+.sb-role { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+.sb-role-admin  { background: rgba(245,158,11,.15); color: var(--amber); }
+.sb-role-client { background: rgba(37,99,235,.2); color: #93C5FD; }
+.sb-section { padding: 18px 16px 4px; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.25); }
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; margin: 1px 8px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,.55);
+  cursor: pointer; transition: all .15s;
+}
+.sb-item:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.85); }
+.sb-item.on { background: rgba(255,255,255,.1); color: #fff; }
+.sb-item .ic { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+.sb-badge { margin-left: auto; background: var(--blue); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+.sb-badge.red { background: var(--red); }
+.sb-foot { margin-top: auto; padding: 14px; border-top: 1px solid rgba(255,255,255,.06); }
+.sb-user { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; background: rgba(255,255,255,.1); flex-shrink: 0; }
+.sb-name  { font-size: 13px; font-weight: 600; color: #fff; }
+.sb-email { font-size: 11px; color: rgba(255,255,255,.35); }
+.sb-action-btn { width: 100%; padding: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 7px; color: rgba(255,255,255,.55); font-size: 12px; font-weight: 500; transition: all .15s; }
+.sb-action-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+.dash-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--slate50); }
+.dash-topbar {
+  height: 56px; background: var(--white); border-bottom: 1px solid var(--slate200);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; flex-shrink: 0;
+}
+.dash-title { font-size: 17px; font-weight: 700; color: var(--navy); }
+.dash-topbar-r { display: flex; align-items: center; gap: 12px; }
+.icon-btn {
+  width: 36px; height: 36px; background: var(--slate50); border: 1px solid var(--slate200);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; cursor: pointer; transition: all .15s; position: relative;
+}
+.icon-btn:hover { border-color: var(--navy); }
+.icon-btn .dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--red); border-radius: 50%; border: 1.5px solid var(--white); }
+.api-status {
+  display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+  border: 1px solid var(--slate200); border-radius: 7px; font-size: 12px; font-weight: 600;
+  color: var(--slate500); cursor: pointer; background: var(--white); transition: all .15s;
+}
+.api-status:hover { border-color: var(--navy); }
+.api-status.live { border-color: var(--green); color: var(--green); background: var(--green-pale); }
+.api-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.dash-body { flex: 1; overflow-y: auto; padding: 24px 28px; }
+.dash-body::-webkit-scrollbar { width: 4px; }
+
+/* PAGES */
+.page { display: none; animation: fadeUp .2s ease; }
+.page.on { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+.mb16 { margin-bottom: 16px; }
+.mb20 { margin-bottom: 20px; }
+.mb24 { margin-bottom: 24px; }
+.page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.page-head h2 { font-size: 17px; font-weight: 700; color: var(--navy); }
+
+/* ═══════════════════════════════════════════
+   CHAT
+═══════════════════════════════════════════ */
+.chat-wrap { display: flex; flex-direction: column; }
+.chat-agent-bar {
+  display: flex; gap: 6px; padding: 12px 16px;
+  border-bottom: 1px solid var(--slate100); flex-wrap: wrap;
+  background: var(--white);
+}
+.a-chip {
+  padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--slate200); color: var(--slate500); cursor: pointer; transition: all .15s;
+}
+.a-chip:hover { border-color: var(--navy); color: var(--navy); }
+.a-chip.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+.chat-msgs {
+  flex: 1; overflow-y: auto; padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  background: var(--slate50); min-height: 300px;
+}
+.chat-msgs::-webkit-scrollbar { width: 3px; }
+.cmsg { display: flex; gap: 10px; max-width: 88%; }
+.cmsg.me { align-self: flex-end; flex-direction: row-reverse; }
+.cmsg-av { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; background: var(--slate200); }
+.cmsg.me .cmsg-av { background: var(--blue); }
+.cmsg-inner {}
+.cmsg-name { font-size: 10px; font-weight: 700; color: var(--slate400); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 3px; }
+.cmsg.me .cmsg-name { text-align: right; }
+.cmsg-bubble { padding: 10px 14px; border-radius: 10px; font-size: 13px; line-height: 1.65; }
+.cmsg.ai .cmsg-bubble { background: var(--white); border: 1px solid var(--slate200); color: var(--slate700); }
+.cmsg.me .cmsg-bubble { background: var(--navy); color: #fff; }
+.typing-dots { display: flex; gap: 3px; align-items: center; padding: 2px 0; }
+.td { width: 5px; height: 5px; background: var(--slate300); border-radius: 50%; animation: tdot 1.2s infinite; }
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{opacity:.3;transform:scale(1)}30%{opacity:1;transform:scale(1.4)}}
+.chat-input-bar {
+  display: flex; gap: 8px; padding: 12px 16px;
+  border-top: 1px solid var(--slate200); background: var(--white);
+}
+.chat-in {
+  flex: 1; background: var(--slate50); border: 1.5px solid var(--slate200);
+  border-radius: 8px; padding: 9px 14px; font-size: 13px; color: var(--navy);
+  outline: none; resize: none; transition: border-color .15s; line-height: 1.5;
+}
+.chat-in:focus { border-color: var(--blue); background: var(--white); }
+.chat-send {
+  padding: 9px 18px; background: var(--navy); border: none;
+  border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s; flex-shrink: 0;
+}
+.chat-send:hover { background: var(--blue); }
+.chat-send:disabled { opacity: .4; cursor: not-allowed; }
+
+/* MINI BAR CHART */
+.bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 64px; }
+.bar-c { flex: 1; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, var(--blue), #60A5FA); min-height: 3px; cursor: pointer; transition: opacity .15s; }
+.bar-c:hover { opacity: .7; }
+.bar-labels { display: flex; gap: 3px; margin-top: 5px; }
+.bar-lbl { flex: 1; font-size: 9px; color: var(--slate400); text-align: center; font-family: var(--mono); }
+
+/* PIPELINE */
+.pipeline { display: flex; align-items: center; overflow-x: auto; padding-bottom: 6px; }
+.pipe-step { display: flex; flex-direction: column; align-items: center; min-width: 90px; }
+.pipe-circle { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--slate200); display: flex; align-items: center; justify-content: center; font-size: 14px; background: var(--white); }
+.pipe-circle.done { background: var(--green-pale); border-color: var(--green); }
+.pipe-circle.going { background: var(--blue-pale); border-color: var(--blue); animation: pulseBorder 1.5s infinite; }
+@keyframes pulseBorder { 0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.3)} 50%{box-shadow:0 0 0 6px transparent} }
+.pipe-lbl { font-size: 10px; color: var(--slate500); margin-top: 6px; text-align: center; line-height: 1.3; }
+.pipe-line { flex: 1; height: 2px; background: var(--slate200); min-width: 24px; margin-bottom: 20px; }
+.pipe-line.done { background: var(--green); }
+
+/* SCORE BAR */
+.score-row { display: flex; align-items: center; gap: 8px; }
+.score-n { font-family: var(--mono); font-size: 12px; color: var(--navy); width: 26px; }
+.score-track { flex: 1; height: 4px; background: var(--slate100); border-radius: 2px; }
+.score-fill { height: 4px; border-radius: 2px; }
+
+/* SUBSCRIPTION BANNER */
+.sub-banner {
+  background: linear-gradient(135deg, var(--navy), #1E3A5F);
+  border-radius: 12px; padding: 26px 28px; color: #fff; margin-bottom: 22px;
+}
+.sub-plan-name { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--amber); margin-bottom: 4px; }
+.sub-title-line { font-family: var(--serif); font-size: 26px; color: #fff; margin-bottom: 4px; }
+.sub-exp { font-size: 13px; color: rgba(255,255,255,.45); margin-bottom: 18px; }
+.sub-feats { display: flex; gap: 20px; flex-wrap: wrap; }
+.sub-feat { font-size: 12px; color: rgba(255,255,255,.65); display: flex; align-items: center; gap: 5px; }
+
+/* ACTIVITY FEED */
+.act-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--slate100); }
+.act-item:last-child { border-bottom: none; }
+.act-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.act-text { font-size: 13px; color: var(--slate600); line-height: 1.5; }
+.act-text strong { color: var(--navy); }
+.act-time { font-size: 11px; color: var(--slate400); margin-top: 2px; font-family: var(--mono); }
+
+/* TOGGLE SWITCH */
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--slate100); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-info h4 { font-size: 13px; font-weight: 600; color: var(--navy); }
+.toggle-info p  { font-size: 12px; color: var(--slate500); margin-top: 1px; }
+.toggle { width: 40px; height: 22px; background: var(--slate200); border-radius: 11px; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; border: none; }
+.toggle.on { background: var(--green); }
+.toggle::after { content: ''; position: absolute; width: 16px; height: 16px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.toggle.on::after { left: 21px; }
+
+/* ═══════════════════════════════════════════
+   VERCEL GUIDE MODAL
+═══════════════════════════════════════════ */
+.guide-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--slate100); }
+.guide-step:last-child { border-bottom: none; }
+.guide-num { width: 28px; height: 28px; background: var(--navy); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.guide-step-body h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+.guide-step-body p { font-size: 13px; color: var(--slate500); line-height: 1.7; }
+.code-block {
+  background: var(--navy); color: #A5F3FC; font-family: var(--mono);
+  font-size: 12px; border-radius: 8px; padding: 12px 16px;
+  margin-top: 8px; overflow-x: auto; white-space: pre; line-height: 1.6;
+  position: relative;
+}
+.copy-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.6); font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 5px; cursor: pointer; transition: all .15s;
+}
+.copy-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+
+/* DNS table */
+.dns-tbl { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+.dns-tbl th { background: var(--slate100); padding: 7px 12px; text-align: left; font-weight: 700; color: var(--slate500); font-size: 11px; letter-spacing: .5px; }
+.dns-tbl td { padding: 7px 12px; border-bottom: 1px solid var(--slate100); color: var(--slate600); font-family: var(--mono); }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════ -->
+
+<!-- API / SETTINGS MODAL -->
+<div id="settingsModal" class="modal-overlay off">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Platform Settings</div>
+      <div class="modal-sub">Configure your API keys. All keys are stored locally in your browser.</div>
+    </div>
+    <div class="modal-body">
+      <label class="f-label">Anthropic API Key</label>
+      <input type="password" id="cfgAnthropic" class="f-input" placeholder="sk-ant-api03-...">
+      <label class="f-label">Stripe Publishable Key</label>
+      <input type="text" id="cfgStripe" class="f-input" placeholder="pk_live_... or pk_test_...">
+      <label class="f-label" style="margin-top:6px">⚠️ Stripe Payment Links</label>
+      <p style="font-size:12px;color:var(--slate500);margin-bottom:10px">Paste your Stripe Payment Link URL per plan. Get these from <strong>dashboard.stripe.com → Payment Links</strong></p>
+      <label class="f-label">Starter Plan Link (€497)</label>
+      <input type="text" id="cfgLinkStarter" class="f-input" placeholder="https://buy.stripe.com/...">
+      <label class="f-label">Growth Plan Link (€1,197)</label>
+      <input type="text" id="cfgLinkGrowth" class="f-input" placeholder="https://buy.stripe.com/...">
+      <label class="f-label">Enterprise Plan Link (€2,997)</label>
+      <input type="text" id="cfgLinkEnterprise" class="f-input" placeholder="https://buy.stripe.com/...">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('settingsModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="saveSettings()">✓ Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- STRIPE CHECKOUT MODAL (for lead purchases) -->
+<div id="stripeModal" class="modal-overlay off">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Purchase Lead</div>
+      <div class="modal-sub" id="stripeModalSub">You are purchasing a qualified real estate lead.</div>
+    </div>
+    <div class="modal-body">
+      <div id="stripeLeadPreview" style="background:var(--slate50);border:1px solid var(--slate200);border-radius:8px;padding:16px;margin-bottom:16px;font-size:13px;color:var(--slate600);line-height:1.7"></div>
+      <label class="f-label">Your Email</label>
+      <input type="email" id="stripeEmail" class="f-input" placeholder="you@example.com">
+      <div id="stripeCardEl" style="background:var(--slate50);border:1.5px solid var(--slate200);border-radius:8px;padding:12px 14px;margin-bottom:8px;min-height:44px;display:flex;align-items:center">
+        <span style="font-size:13px;color:var(--slate400)">💳 Card details will appear here after Stripe keys are configured</span>
+      </div>
+      <p style="font-size:11px;color:var(--slate400)">🔒 Secured by Stripe. Your card data never touches our servers.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('stripeModal')">Cancel</button>
+      <button class="btn btn-amber" id="stripePayBtn" onclick="processLeadPayment()">Pay <span id="stripePayAmt"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- VERCEL DEPLOYMENT GUIDE -->
+<div id="vercelModal" class="modal-overlay off">
+  <div class="modal-box" style="max-width:640px">
+    <div class="modal-head">
+      <div class="modal-title">🚀 Deploy to Vercel</div>
+      <div class="modal-sub">Get daltonsai.com live in under 15 minutes. Follow these exact steps.</div>
+    </div>
+    <div class="modal-body">
+
+      <div class="guide-step">
+        <div class="guide-num">1</div>
+        <div class="guide-step-body">
+          <h4>Download & extract the ZIP file</h4>
+          <p>Download the ZIP you received. Right-click it → <strong>Extract All</strong>. You'll see one file: <code style="background:var(--slate100);padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:11px">index.html</code></p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">2</div>
+        <div class="guide-step-body">
+          <h4>Upload to GitHub</h4>
+          <p>Go to <strong>github.com</strong> → Open your <strong>Daltonsai</strong> repository → Click <strong>"uploading an existing file"</strong> → Drag <code style="background:var(--slate100);padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:11px">index.html</code> into the box → Click the green <strong>"Commit changes"</strong> button.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">3</div>
+        <div class="guide-step-body">
+          <h4>Deploy on Vercel</h4>
+          <p>Go to <strong>vercel.com</strong> → Sign in with GitHub → Click <strong>"Add New Project"</strong> → Select <strong>Daltonsai</strong> → Leave all settings default → Click <strong>"Deploy"</strong>. After ~30 seconds your site is live at <strong>daltonsai.vercel.app</strong></p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">4</div>
+        <div class="guide-step-body">
+          <h4>Connect daltonsai.com</h4>
+          <p>In Vercel: your project → <strong>Settings</strong> → <strong>Domains</strong> → type <strong>daltonsai.com</strong> → Add. Vercel shows you DNS values. Go to wherever you bought your domain and set:</p>
+          <table class="dns-tbl">
+            <tr><th>Type</th><th>Name / Host</th><th>Value</th></tr>
+            <tr><td>A</td><td>@</td><td>76.76.21.21</td></tr>
+            <tr><td>CNAME</td><td>www</td><td>cname.vercel-dns.com</td></tr>
+          </table>
+          <p style="margin-top:8px;font-size:12px;color:var(--slate400)">DNS can take 5–48 hours. Vercel adds HTTPS automatically ✅</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">5</div>
+        <div class="guide-step-body">
+          <h4>Add your API keys & Stripe links</h4>
+          <p>On your live site, click <strong>Admin Login</strong> → click <strong>⚙ Settings</strong> in the top bar → paste your Anthropic API key and Stripe Payment Link URLs. You get Stripe links at <strong>dashboard.stripe.com → Payment Links → Create</strong>.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-num">6</div>
+        <div class="guide-step-body">
+          <h4>Future updates</h4>
+          <p>When you get an updated <strong>index.html</strong> from me: go to GitHub → click <strong>index.html</strong> → click the pencil icon → paste the new code → Commit. Vercel auto-deploys in 30 seconds. ✅</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-navy" style="width:100%" onclick="closeModal('vercelModal')">Got it — Let's go! 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     VIEW 1 — LANDING PAGE
+═══════════════════════════════════════════════════════ -->
+<div id="landing" class="view on">
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-dot"></div>
+      Daltons AI
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" href="#services">Services</a>
+      <a class="nav-link" href="#leads">Leads</a>
+      <a class="nav-link" href="#pricing">Pricing</a>
+      <a class="nav-link" href="#" onclick="openModal('vercelModal');return false">Deploy Guide</a>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-outline btn-sm" onclick="goClient()">Client Login</button>
+      <button class="btn btn-navy btn-sm" onclick="goAdmin()">Admin Panel</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-label">
+        <span class="hero-live-dot"></span>
+        Live · KVK 97688835 · Daltons AI B.V.
+      </div>
+      <h1 class="hero-h1">
+        Build a business that<br>
+        grows, scales &amp; sells<br>
+        <em>99% automatically.</em>
+      </h1>
+      <p class="hero-p">
+        13 AI agents running your entire operation. Lead generation, outreach, market research, content, sales — fully automated. You set the direction. The AI does the work.
+      </p>
+      <div class="hero-cta">
+        <button class="btn btn-amber btn-lg" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">
+          Start Automating →
+        </button>
+        <button class="btn btn-lg" style="background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15)" onclick="openModal('vercelModal')">
+          Deploy Guide
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-n">13<span>+</span></div>
+          <div class="hero-stat-l">AI Agents</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-n">500<span>+</span></div>
+          <div class="hero-stat-l">Leads / Month</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-n">99<span>%</span></div>
+          <div class="hero-stat-l">Automated</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-n">5</div>
+          <div class="hero-stat-l">Global Markets</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section" id="services" style="background:var(--white)">
+    <div class="section-inner">
+      <div class="section-tag">What We Build</div>
+      <h2 class="section-h2">AI services that <em>sell themselves</em></h2>
+      <p class="section-p">Our AI Developer Agent builds, maintains, and improves these services automatically. Every service is a revenue stream.</p>
+      <div class="services-grid">
+        <div class="svc">
+          <div class="svc-icon">🎯</div>
+          <div class="svc-tag" style="background:var(--blue-pale);color:var(--blue)">BESTSELLER</div>
+          <h3>Lead Generator Pro</h3>
+          <p>Daily qualified real estate leads from Singapore, Dubai, NYC, Tokyo & Hong Kong. AI-scored and contact-verified.</p>
+          <div class="svc-price">€299 <span>/month</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">📊</div>
+          <div class="svc-tag" style="background:var(--green-pale);color:var(--green)">AUTOMATED</div>
+          <h3>Market Research AI</h3>
+          <p>Weekly AI-generated market reports per city, per segment. Prices, trends, volumes — delivered automatically.</p>
+          <div class="svc-price">€199 <span>/month</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">✉️</div>
+          <div class="svc-tag" style="background:#FFF7ED;color:var(--orange)">POPULAR</div>
+          <h3>Outreach Automation</h3>
+          <p>Personalised cold email & LinkedIn campaigns on autopilot. A/B testing, follow-ups, full reporting included.</p>
+          <div class="svc-price">€249 <span>/month</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">🌐</div>
+          <div class="svc-tag" style="background:#FDF4FF;color:#9333EA">AI-POWERED</div>
+          <h3>SEO Content Engine</h3>
+          <p>Auto-generated SEO articles, property descriptions, social content in English, Dutch & Mandarin.</p>
+          <div class="svc-price">€179 <span>/month</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">📱</div>
+          <div class="svc-tag" style="background:var(--amber-pale);color:var(--orange)">NEW</div>
+          <h3>Social Media Agent</h3>
+          <p>Daily posts, property spotlights, engagement responses for LinkedIn, Instagram & WeChat — fully automated.</p>
+          <div class="svc-price">€149 <span>/month</span></div>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">🤖</div>
+          <div class="svc-tag" style="background:var(--green-pale);color:var(--green)">ENTERPRISE</div>
+          <h3>Custom AI Assistant</h3>
+          <p>Dedicated AI agent configured for your office. Integrates with your CRM, qualifies leads 24/7 automatically.</p>
+          <div class="svc-price">€499 <span>/month</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEADS -->
+  <section class="section" id="leads" style="background:var(--slate50)">
+    <div class="section-inner">
+      <div class="section-tag">Lead Marketplace</div>
+      <h2 class="section-h2">Buy <em>qualified leads</em> directly</h2>
+      <p class="section-p">Our AI scans LinkedIn, property portals, and social media daily across 5 markets. Hot leads scored up to 100. Buy only what you need.</p>
+      <div class="leads-wrap">
+        <div class="leads-head">
+          <h4>🔴 Live Lead Feed — Available Today</h4>
+          <span>247 leads available</span>
+        </div>
+        <div class="lead-row thead">
+          <div class="lead-cell thead-cell">Company / Contact</div>
+          <div class="lead-cell thead-cell">Market</div>
+          <div class="lead-cell thead-cell">Type</div>
+          <div class="lead-cell thead-cell">Score</div>
+          <div class="lead-cell thead-cell">Buy</div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-cell"><strong>PropNex Realty</strong><small>David Tan — COO</small></div>
+          <div class="lead-cell">🇸🇬 Singapore</div>
+          <div class="lead-cell"><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></div>
+          <div class="lead-cell">94/100</div>
+          <div class="lead-cell"><button class="buy-btn" onclick="openLeadPurchase('PropNex Realty','David Tan — COO','Singapore','94',49)">€49</button></div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-cell"><strong>Emirates Living</strong><small>Sara Al-Hassan — MD</small></div>
+          <div class="lead-cell">🇦🇪 Dubai</div>
+          <div class="lead-cell"><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></div>
+          <div class="lead-cell">89/100</div>
+          <div class="lead-cell"><button class="buy-btn" onclick="openLeadPurchase('Emirates Living','Sara Al-Hassan — MD','Dubai','89',49)">€49</button></div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-cell"><strong>Corcoran Group</strong><small>Michael Ross — VP Sales</small></div>
+          <div class="lead-cell">🇺🇸 New York</div>
+          <div class="lead-cell"><span class="pill pill-amber"><span class="pill-dot"></span>WARM</span></div>
+          <div class="lead-cell">76/100</div>
+          <div class="lead-cell"><button class="buy-btn" onclick="openLeadPurchase('Corcoran Group','Michael Ross — VP','New York','76',29)">€29</button></div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-cell"><strong>Mitsui Fudosan</strong><small>Kenji Nakamura — Director</small></div>
+          <div class="lead-cell">🇯🇵 Tokyo</div>
+          <div class="lead-cell"><span class="pill pill-blue"><span class="pill-dot"></span>NEW</span></div>
+          <div class="lead-cell">71/100</div>
+          <div class="lead-cell"><button class="buy-btn" onclick="openLeadPurchase('Mitsui Fudosan','Kenji Nakamura','Tokyo','71',19)">€19</button></div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-cell"><strong>Centaline Property</strong><small>Jenny Lau — CEO</small></div>
+          <div class="lead-cell">🇭🇰 Hong Kong</div>
+          <div class="lead-cell"><span class="pill pill-amber"><span class="pill-dot"></span>WARM</span></div>
+          <div class="lead-cell">68/100</div>
+          <div class="lead-cell"><button class="buy-btn" onclick="openLeadPurchase('Centaline Property','Jenny Lau','Hong Kong','68',19)">€19</button></div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--slate400);margin-top:12px;text-align:center">Subscribers get 20–200 free leads/month. Individual leads: €19–€49 based on score.</p>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section" id="pricing" style="background:var(--white)">
+    <div class="section-inner">
+      <div class="section-tag">3-Month Plans</div>
+      <h2 class="section-h2">Lock in, automate, <em>grow.</em></h2>
+      <p class="section-p">Fixed 3-month contract. Minimum price, maximum automation. Cancel-or-renew monthly after that.</p>
+      <div class="pricing-grid">
+
+        <div class="plan">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">€497 <sub>/3 months</sub></div>
+          <div class="plan-period">For agencies starting to automate</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>3 AI Agents active</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>20 leads per month</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Outreach Automation</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>SEO Content (4×/month)</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Monthly report</div>
+          <button class="plan-btn plan-btn-outline" onclick="stripePay('starter')">Get Started — €497</button>
+        </div>
+
+        <div class="plan featured">
+          <div class="plan-badge">MOST POPULAR</div>
+          <div class="plan-name">Growth</div>
+          <div class="plan-price">€1,197 <sub>/3 months</sub></div>
+          <div class="plan-period">For active offices ready to scale</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>7 AI Agents active</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>50 leads per month</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Outreach + LinkedIn</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Weekly market research</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Social Media Agent</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Dedicated AI Assistant</div>
+          <button class="plan-btn plan-btn-amber" onclick="stripePay('growth')">Start Growing — €1,197</button>
+        </div>
+
+        <div class="plan">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">€2,997 <sub>/3 months</sub></div>
+          <div class="plan-period">For large agencies & developers</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>All 13 agents fully active</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>200 leads per month</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Dedicated CEO Agent</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Daily market reports</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>CRM integration</div>
+          <div class="plan-feature"><div class="plan-check">✓</div>Priority support + SLA</div>
+          <button class="plan-btn plan-btn-outline" onclick="stripePay('enterprise')">Contact Us — €2,997</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo"><div class="footer-logo-dot"></div>Daltons AI</div>
+        <p class="footer-p">AI Software Factory for real estate.<br>Registered in the Netherlands — KVK 97688835.<br>Daltons AI B.V. · Amsterdam</p>
+      </div>
+      <div class="footer-col">
+        <h5>Services</h5>
+        <a href="#">Lead Generator</a>
+        <a href="#">Market Research</a>
+        <a href="#">Outreach AI</a>
+        <a href="#">SEO Engine</a>
+        <a href="#">Social Media</a>
+      </div>
+      <div class="footer-col">
+        <h5>Markets</h5>
+        <a href="#">Singapore</a>
+        <a href="#">Dubai</a>
+        <a href="#">New York</a>
+        <a href="#">Tokyo</a>
+        <a href="#">Hong Kong</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#" onclick="openModal('vercelModal');return false">Deploy Guide</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">GDPR / AVG</a>
+        <a href="#" onclick="goAdmin();return false">Admin Login</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Daltons AI B.V. · KVK 97688835 · All rights reserved.</p>
+      <p>🇳🇱 Amsterdam · 🇸🇬 Singapore · 🇦🇪 Dubai</p>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     VIEW 2 — ADMIN DASHBOARD
+═══════════════════════════════════════════════════════ -->
+<div id="admin" class="view">
+
+  <div class="dash-sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name"><div class="sb-logo-dot"></div>Daltons AI</div>
+      <div class="sb-role sb-role-admin">⬡ Chairman</div>
+    </div>
+    <div class="sb-section">Overview</div>
+    <div class="sb-item on" onclick="aPage('overview',this)"><span class="ic">📊</span>Dashboard</div>
+    <div class="sb-item" onclick="aPage('activity',this)"><span class="ic">⚡</span>Live Activity<span class="sb-badge">4</span></div>
+    <div class="sb-section">Agents</div>
+    <div class="sb-item" onclick="aPage('agents',this)"><span class="ic">🤖</span>Agent Control</div>
+    <div class="sb-item" onclick="aPage('aidev',this)"><span class="ic">🛠️</span>AI Developer</div>
+    <div class="sb-section">Business</div>
+    <div class="sb-item" onclick="aPage('clients',this)"><span class="ic">👥</span>Clients<span class="sb-badge">12</span></div>
+    <div class="sb-item" onclick="aPage('leads_mgr',this)"><span class="ic">🎯</span>Leads Manager</div>
+    <div class="sb-item" onclick="aPage('research',this)"><span class="ic">🔍</span>Market Research</div>
+    <div class="sb-item" onclick="aPage('revenue',this)"><span class="ic">💰</span>Revenue</div>
+    <div class="sb-section">System</div>
+    <div class="sb-item" onclick="aPage('automation',this)"><span class="ic">⚙️</span>Automation</div>
+    <div class="sb-item" onclick="showView('landing')"><span class="ic">←</span>Back to Site</div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">👑</div>
+        <div><div class="sb-name">Chairman</div><div class="sb-email">Daltons AI B.V.</div></div>
+      </div>
+      <button class="sb-action-btn" onclick="openModal('settingsModal')">⚙ Settings & API Keys</button>
+    </div>
+  </div>
+
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div class="dash-title" id="adminTitle">Dashboard</div>
+      <div class="dash-topbar-r">
+        <div class="icon-btn" onclick="notify('🔔 4 new alerts')">🔔<div class="dot"></div></div>
+        <div class="api-status" id="apiStatusBtn" onclick="openModal('settingsModal')">
+          <div class="api-dot"></div>
+          <span id="apiStatusTxt">Configure API</span>
+        </div>
+        <button class="btn btn-navy btn-sm" onclick="notify('✓ Deploy guide opened','blue');openModal('vercelModal')">🚀 Deploy Guide</button>
+      </div>
+    </div>
+
+    <div class="dash-body">
+
+      <!-- OVERVIEW -->
+      <div class="page on" id="ap-overview">
+        <div class="grid-4 mb20">
+          <div class="metric">
+            <div class="metric-label">Monthly Revenue</div>
+            <div class="metric-val">€8,240</div>
+            <div class="metric-sub up">↑ 18% vs last month</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Active Clients</div>
+            <div class="metric-val">12</div>
+            <div class="metric-sub up">↑ 2 new this week</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Leads Generated</div>
+            <div class="metric-val">847</div>
+            <div class="metric-sub up">↑ 124 today</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Agents Online</div>
+            <div class="metric-val">13/13</div>
+            <div class="metric-sub up">● All systems active</div>
+          </div>
+        </div>
+        <div class="grid-2 mb20">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">📈 Revenue — This Month</div>
+              <span style="font-size:11px;color:var(--slate400)">Daily</span>
+            </div>
+            <div class="card-body">
+              <div class="bar-chart" id="adminRevenueChart"></div>
+              <div class="bar-labels" id="adminRevenueLabels"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">⚡ Live Activity</div>
+              <button class="btn btn-ghost btn-sm" onclick="aPage('activity',null)">See all</button>
+            </div>
+            <div class="card-body" style="padding:0 16px">
+              <div class="act-item"><div class="act-icon" style="background:var(--blue-pale)">🎯</div><div><div class="act-text"><strong>Lead Scout</strong> found 12 new leads in Singapore</div><div class="act-time">2 min ago</div></div></div>
+              <div class="act-item"><div class="act-icon" style="background:var(--green-pale)">✉️</div><div><div class="act-text"><strong>Outreach Agent</strong> sent 45 cold emails</div><div class="act-time">8 min ago</div></div></div>
+              <div class="act-item"><div class="act-icon" style="background:var(--amber-pale)">📊</div><div><div class="act-text"><strong>Analytics Agent</strong> generated Dubai report</div><div class="act-time">23 min ago</div></div></div>
+              <div class="act-item"><div class="act-icon" style="background:#FDF4FF">💰</div><div><div class="act-text">New subscription: <strong>PropNex</strong> — Growth plan</div><div class="act-time">1 hour ago</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">🤖 Agent Status — Live</div>
+            <button class="btn btn-navy btn-sm" onclick="aPage('agents',null)">Manage Agents</button>
+          </div>
+          <table class="tbl">
+            <tr><th>Agent</th><th>Status</th><th>Current Task</th><th>Load</th><th>Tasks Today</th><th>Action</th></tr>
+            <tr><td><strong>👑 CEO Agent</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>Strategy review</td><td><div style="width:80px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:45%;height:4px;background:var(--blue);border-radius:2px"></div></div></td><td>34</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('ceo')">Chat</button></td></tr>
+            <tr><td><strong>⚡ CTO Agent</strong></td><td><span class="pill pill-amber"><span class="pill-dot"></span>Busy</span></td><td>Stack optimisation</td><td><div style="width:80px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:78%;height:4px;background:var(--orange);border-radius:2px"></div></div></td><td>58</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('cto')">Chat</button></td></tr>
+            <tr><td><strong>🔍 Lead Scout</strong></td><td><span class="pill pill-amber"><span class="pill-dot"></span>Busy</span></td><td>Singapore scan</td><td><div style="width:80px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:92%;height:4px;background:var(--red);border-radius:2px"></div></div></td><td>124</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('leadscout')">Chat</button></td></tr>
+            <tr><td><strong>✉️ Outreach Agent</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>Dubai campaign</td><td><div style="width:80px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:61%;height:4px;background:var(--blue);border-radius:2px"></div></div></td><td>87</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('outreach')">Chat</button></td></tr>
+            <tr><td><strong>💰 CFO Agent</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>MRR report</td><td><div style="width:80px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:32%;height:4px;background:var(--blue);border-radius:2px"></div></div></td><td>21</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('cfo')">Chat</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- AGENTS -->
+      <div class="page" id="ap-agents">
+        <div class="page-head">
+          <h2>Agent Control Center</h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="notify('↺ Status refreshed','blue')">↺ Refresh</button>
+            <button class="btn btn-navy btn-sm" onclick="notify('▶ All agents started','green')">▶ Start All</button>
+          </div>
+        </div>
+        <div class="card mb20">
+          <div class="card-head"><div class="card-title">💬 Talk to Any Agent</div></div>
+          <div id="adminAgentBar" class="chat-agent-bar"></div>
+          <div class="chat-wrap" id="adminChatWrap">
+            <div class="chat-msgs" id="adminChatMsgs" style="height:360px">
+              <div style="text-align:center;color:var(--slate400);font-size:13px;padding:60px 20px">Select an agent above to start chatting</div>
+            </div>
+            <div class="chat-input-bar">
+              <textarea class="chat-in" id="adminChatIn" rows="1" placeholder="Give an instruction to the selected agent..." onkeydown="handleKey(event,'adminChat')" oninput="autoResize(this)"></textarea>
+              <button class="chat-send" id="adminChatSend" onclick="sendAdminMsg()">Send</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">⚙️ All Agents</div></div>
+          <table class="tbl">
+            <tr><th>Agent</th><th>Department</th><th>Status</th><th>Last Action</th><th>Actions</th></tr>
+            <tr><td><strong>👑 CEO Agent</strong></td><td>Executive</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>2 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('ceo')">Chat</button> <button class="btn btn-ghost btn-sm" onclick="notify('⏸ CEO Agent paused','amber')">Pause</button></td></tr>
+            <tr><td><strong>⚡ CTO Agent</strong></td><td>Technology</td><td><span class="pill pill-amber"><span class="pill-dot"></span>Busy</span></td><td>5 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('cto')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>💰 CFO Agent</strong></td><td>Finance</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>12 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('cfo')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>📣 CMO Agent</strong></td><td>Marketing</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>18 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('cmo')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>🎯 CSO Agent</strong></td><td>Sales</td><td><span class="pill pill-slate"><span class="pill-dot"></span>Idle</span></td><td>1 hr</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('cso')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>⚖️ Legal Agent</strong></td><td>Legal</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>34 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('legal')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>🧠 Product Agent</strong></td><td>Product</td><td><span class="pill pill-slate"><span class="pill-dot"></span>Idle</span></td><td>2 hr</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('product')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>🔍 Lead Scout</strong></td><td>AI Factory</td><td><span class="pill pill-amber"><span class="pill-dot"></span>Busy</span></td><td>1 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('leadscout')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>✉️ Outreach Agent</strong></td><td>AI Factory</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>4 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('outreach')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>📊 Analytics</strong></td><td>AI Factory</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>8 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('analytics')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>🌐 SEO Agent</strong></td><td>AI Factory</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>15 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('seo')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>👥 HR Agent</strong></td><td>Operations</td><td><span class="pill pill-slate"><span class="pill-dot"></span>Idle</span></td><td>3 hr</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('hr')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+            <tr><td><strong>🔧 DevOps Agent</strong></td><td>Operations</td><td><span class="pill pill-green"><span class="pill-dot"></span>Online</span></td><td>6 min</td><td><button class="btn btn-outline btn-sm" onclick="openAdminChat('devops')">Chat</button> <button class="btn btn-ghost btn-sm">Pause</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- AI DEVELOPER -->
+      <div class="page" id="ap-aidev">
+        <div class="page-head">
+          <h2>🛠️ AI Developer Agent</h2>
+          <button class="btn btn-navy btn-sm" onclick="notify('🚀 New service build started','green')">+ Build New Service</button>
+        </div>
+        <div class="grid-2 mb20">
+          <div class="card">
+            <div class="card-head"><div class="card-title">💬 AI Developer Chat</div><span class="pill pill-green"><span class="pill-dot"></span>Online</span></div>
+            <div class="chat-wrap">
+              <div class="chat-msgs" id="devChatMsgs" style="height:380px"></div>
+              <div class="chat-input-bar">
+                <textarea class="chat-in" id="devChatIn" rows="1" placeholder="Say: Build a service for... or Research the market in..." onkeydown="handleKey(event,'devChat')" oninput="autoResize(this)"></textarea>
+                <button class="chat-send" id="devChatSend" onclick="sendDevMsg()">Build</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card mb16">
+              <div class="card-head"><div class="card-title">🚀 Build Pipeline</div></div>
+              <div class="card-body">
+                <div class="pipeline">
+                  <div class="pipe-step"><div class="pipe-circle done">✓</div><div class="pipe-lbl">Market Analysis</div></div>
+                  <div class="pipe-line done"></div>
+                  <div class="pipe-step"><div class="pipe-circle done">✓</div><div class="pipe-lbl">Service Design</div></div>
+                  <div class="pipe-line done"></div>
+                  <div class="pipe-step"><div class="pipe-circle going">⚙</div><div class="pipe-lbl">Code Gen</div></div>
+                  <div class="pipe-line"></div>
+                  <div class="pipe-step"><div class="pipe-circle">4</div><div class="pipe-lbl">Testing</div></div>
+                  <div class="pipe-line"></div>
+                  <div class="pipe-step"><div class="pipe-circle">5</div><div class="pipe-lbl">Deploy</div></div>
+                </div>
+                <div style="margin-top:14px;background:var(--slate50);border-radius:8px;padding:14px">
+                  <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px">Active: Lead Score Engine v2.1</div>
+                  <div class="progress-wrap"><div class="progress-row"><span>Progress</span><span>68%</span></div><div class="progress-track"><div class="progress-fill" style="width:68%"></div></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><div class="card-title">📦 Live Services</div><button class="btn btn-navy btn-sm" onclick="notify('✓ Published to website','green')">Publish All</button></div>
+              <table class="tbl">
+                <tr><th>Service</th><th>Clients</th><th>MRR</th><th>Status</th></tr>
+                <tr><td><strong>Lead Generator Pro</strong></td><td>8</td><td>€2,392</td><td><span class="pill pill-green"><span class="pill-dot"></span>Live</span></td></tr>
+                <tr><td><strong>Market Research AI</strong></td><td>5</td><td>€995</td><td><span class="pill pill-green"><span class="pill-dot"></span>Live</span></td></tr>
+                <tr><td><strong>Outreach Automation</strong></td><td>7</td><td>€1,743</td><td><span class="pill pill-green"><span class="pill-dot"></span>Live</span></td></tr>
+                <tr><td><strong>SEO Content Engine</strong></td><td>4</td><td>€716</td><td><span class="pill pill-amber"><span class="pill-dot"></span>Updating</span></td></tr>
+                <tr><td><strong>Social Media Agent</strong></td><td>3</td><td>€447</td><td><span class="pill pill-green"><span class="pill-dot"></span>Live</span></td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div class="page" id="ap-clients">
+        <div class="page-head">
+          <h2>Client Management</h2>
+          <button class="btn btn-navy btn-sm" onclick="notify('📧 Invitation sent','green')">+ Invite Client</button>
+        </div>
+        <div class="grid-3 mb20">
+          <div class="metric"><div class="metric-label">Active Subscriptions</div><div class="metric-val">12</div><div class="metric-sub up">↑ 2 new</div></div>
+          <div class="metric"><div class="metric-label">Monthly Recurring</div><div class="metric-val">€8,240</div><div class="metric-sub up">↑ €1,240 added</div></div>
+          <div class="metric"><div class="metric-label">Churn Rate</div><div class="metric-val">4.2%</div><div class="metric-sub down">Low — healthy</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">👥 All Clients</div></div>
+          <table class="tbl">
+            <tr><th>Company</th><th>Country</th><th>Plan</th><th>Start</th><th>Expires</th><th>Leads/Mo</th><th>Health</th></tr>
+            <tr><td><strong>PropNex Realty</strong></td><td>🇸🇬</td><td><span class="pill pill-blue">Growth</span></td><td>1 Mar</td><td>31 May</td><td>50</td><td><div style="width:60px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:92%;height:4px;background:var(--green);border-radius:2px"></div></div></td></tr>
+            <tr><td><strong>Emirates Living</strong></td><td>🇦🇪</td><td><span class="pill pill-amber">Enterprise</span></td><td>15 Feb</td><td>15 May</td><td>200</td><td><div style="width:60px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:88%;height:4px;background:var(--green);border-radius:2px"></div></div></td></tr>
+            <tr><td><strong>Corcoran Group</strong></td><td>🇺🇸</td><td><span class="pill pill-blue">Growth</span></td><td>10 Feb</td><td>10 May</td><td>50</td><td><div style="width:60px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:74%;height:4px;background:var(--blue);border-radius:2px"></div></div></td></tr>
+            <tr><td><strong>Mitsui Fudosan</strong></td><td>🇯🇵</td><td><span class="pill pill-slate">Starter</span></td><td>1 Mar</td><td>31 May</td><td>20</td><td><div style="width:60px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:65%;height:4px;background:var(--blue);border-radius:2px"></div></div></td></tr>
+            <tr><td><strong>Centaline Property</strong></td><td>🇭🇰</td><td><span class="pill pill-amber">Enterprise</span></td><td>20 Jan</td><td>20 Apr</td><td>200</td><td><div style="width:60px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:95%;height:4px;background:var(--green);border-radius:2px"></div></div></td></tr>
+            <tr><td><strong>Savills Singapore</strong></td><td>🇸🇬</td><td><span class="pill pill-blue">Growth</span></td><td>5 Mar</td><td>5 Jun</td><td>50</td><td><div style="width:60px;height:4px;background:var(--slate100);border-radius:2px"><div style="width:80%;height:4px;background:var(--blue);border-radius:2px"></div></div></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- LEADS MANAGER -->
+      <div class="page" id="ap-leads_mgr">
+        <div class="page-head">
+          <h2>Lead Management & Sales</h2>
+          <button class="btn btn-navy btn-sm" onclick="notify('🔍 Lead scan started','green')">+ Start Scan</button>
+        </div>
+        <div class="grid-4 mb20">
+          <div class="metric"><div class="metric-label">Total Lead Database</div><div class="metric-val">4,847</div><div class="metric-sub up">↑ 124 today</div></div>
+          <div class="metric"><div class="metric-label">Sold This Month</div><div class="metric-val">312</div><div class="metric-sub up">€6,240 revenue</div></div>
+          <div class="metric"><div class="metric-label">Available to Buy</div><div class="metric-val">247</div><div class="metric-sub">Fresh leads</div></div>
+          <div class="metric"><div class="metric-label">Avg. Lead Score</div><div class="metric-val">78/100</div><div class="metric-sub up">High quality</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">🎯 Lead Database</div><input style="padding:6px 12px;border:1px solid var(--slate200);border-radius:6px;font-size:12px;color:var(--navy);background:var(--slate50);outline:none" placeholder="🔍 Search leads..."></div>
+          <table class="tbl">
+            <tr><th>Company</th><th>Contact</th><th>Market</th><th>Type</th><th>Score</th><th>Price</th><th>Status</th></tr>
+            <tr><td><strong>PropNex Realty</strong></td><td>David Tan — COO</td><td>🇸🇬</td><td><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></td><td><div class="score-row"><span class="score-n">94</span><div class="score-track"><div class="score-fill" style="width:94%;background:var(--red)"></div></div></div></td><td><strong>€49</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>Available</span></td></tr>
+            <tr><td><strong>Emirates Living</strong></td><td>Sara Al-Hassan — MD</td><td>🇦🇪</td><td><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></td><td><div class="score-row"><span class="score-n">89</span><div class="score-track"><div class="score-fill" style="width:89%;background:var(--red)"></div></div></div></td><td><strong>€49</strong></td><td><span class="pill pill-amber"><span class="pill-dot"></span>Reserved</span></td></tr>
+            <tr><td><strong>Corcoran Group</strong></td><td>Michael Ross — VP</td><td>🇺🇸</td><td><span class="pill pill-amber"><span class="pill-dot"></span>WARM</span></td><td><div class="score-row"><span class="score-n">76</span><div class="score-track"><div class="score-fill" style="width:76%;background:var(--amber)"></div></div></div></td><td><strong>€29</strong></td><td><span class="pill pill-green"><span class="pill-dot"></span>Available</span></td></tr>
+            <tr><td><strong>Knight Frank HK</strong></td><td>Alice Wong — Director</td><td>🇭🇰</td><td><span class="pill pill-amber"><span class="pill-dot"></span>WARM</span></td><td><div class="score-row"><span class="score-n">82</span><div class="score-track"><div class="score-fill" style="width:82%;background:var(--amber)"></div></div></div></td><td><strong>€29</strong></td><td><span class="pill pill-slate"><span class="pill-dot"></span>Sold</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- MARKET RESEARCH -->
+      <div class="page" id="ap-research">
+        <div class="page-head">
+          <h2>Market Research Automation</h2>
+          <button class="btn btn-navy btn-sm" onclick="notify('📊 New research started','green')">+ Start Research</button>
+        </div>
+        <div class="card mb20">
+          <div class="card-head"><div class="card-title">🔍 Research AI Agent</div><span class="pill pill-green"><span class="pill-dot"></span>Online</span></div>
+          <div class="chat-wrap">
+            <div class="chat-msgs" id="resChatMsgs" style="height:300px"></div>
+            <div class="chat-input-bar">
+              <textarea class="chat-in" id="resChatIn" rows="1" placeholder="e.g. Analyse the Dubai luxury property market in Q1 2025..." onkeydown="handleKey(event,'resChat')" oninput="autoResize(this)"></textarea>
+              <button class="chat-send" id="resChatSend" onclick="sendResMsg()">Research</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card" style="cursor:pointer" onclick="notify('📖 Report opened: Singapore','blue')">
+            <div class="card-body">
+              <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🇸🇬 Singapore Luxury Condo Q1 2025</h4>
+              <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:10px">847 transactions analysed. Avg price SGD 2.8M. +12% YoY in Orchard and Marina Bay.</p>
+              <span class="pill pill-green"><span class="pill-dot"></span>Complete — 2 days ago</span>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="notify('📖 Report opened: Dubai','blue')">
+            <div class="card-body">
+              <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🇦🇪 Dubai Off-Plan Market 2025</h4>
+              <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:10px">412 developer projects analysed. JVC and Dubai Creek Harbour growing. Foreign buyers +34%.</p>
+              <span class="pill pill-green"><span class="pill-dot"></span>Complete — 5 days ago</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🇺🇸 NYC Manhattan Rental Index</h4>
+              <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:10px">Rental prices stabilising after 2024 peak. Rising tech-worker demand in Brooklyn and LIC.</p>
+              <span class="pill pill-amber"><span class="pill-dot"></span>Updating now...</span>
+            </div>
+          </div>
+          <div class="card" style="cursor:pointer" onclick="notify('📖 Report opened: Tokyo','blue')">
+            <div class="card-body">
+              <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🇯🇵 Tokyo Residential Investment</h4>
+              <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:10px">Weak yen attracting international buyers. Record demand in Minato and Shibuya.</p>
+              <span class="pill pill-green"><span class="pill-dot"></span>Complete — 1 week ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVENUE -->
+      <div class="page" id="ap-revenue">
+        <div class="page-head"><h2>Revenue & Finance</h2><button class="btn btn-outline btn-sm">📥 Export</button></div>
+        <div class="grid-4 mb20">
+          <div class="metric"><div class="metric-label">ARR (Annual)</div><div class="metric-val">€98,880</div><div class="metric-sub up">↑ 34% YoY</div></div>
+          <div class="metric"><div class="metric-label">MRR</div><div class="metric-val">€8,240</div><div class="metric-sub up">↑ 18%</div></div>
+          <div class="metric"><div class="metric-label">Lead Revenue</div><div class="metric-val">€6,240</div><div class="metric-sub up">312 leads sold</div></div>
+          <div class="metric"><div class="metric-label">Net Margin</div><div class="metric-val">72%</div><div class="metric-sub up">AI = low cost</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><div class="card-head"><div class="card-title">MRR Growth 2025</div></div><div class="card-body"><div class="bar-chart" id="mrrChart"></div><div class="bar-labels" id="mrrLabels"></div></div></div>
+          <div class="card"><div class="card-head"><div class="card-title">Revenue by Plan</div></div><div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><strong>Enterprise</strong><span style="color:var(--green);font-weight:700">€5,994</span></div><div class="progress-track"><div class="progress-fill" style="width:73%;background:linear-gradient(90deg,var(--amber),var(--amber2))"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><strong>Growth</strong><span style="color:var(--blue);font-weight:700">€3,591</span></div><div class="progress-track"><div class="progress-fill" style="width:44%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><strong>Starter</strong><span style="color:var(--slate500);font-weight:700">€994</span></div><div class="progress-track"><div class="progress-fill" style="width:12%;background:linear-gradient(90deg,var(--slate300),var(--slate400))"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><strong>Lead Sales</strong><span style="color:var(--green);font-weight:700">€6,240</span></div><div class="progress-track"><div class="progress-fill" style="width:76%;background:linear-gradient(90deg,var(--green),#34D399)"></div></div></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- AUTOMATION -->
+      <div class="page" id="ap-automation">
+        <div class="page-head"><h2>Automation Settings</h2></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><div class="card-title">⚡ Auto-Processes</div></div>
+            <div class="card-body" style="padding:0 20px">
+              <div class="toggle-row"><div class="toggle-info"><h4>Daily Lead Scanning</h4><p>Scan all markets every morning at 6:00 AM</p></div><button class="toggle on" onclick="this.classList.toggle('on');notify(this.classList.contains('on')?'✓ Lead scanning on':'⏸ Lead scanning off','green')"></button></div>
+              <div class="toggle-row"><div class="toggle-info"><h4>Outreach Automator</h4><p>Send daily email campaigns automatically</p></div><button class="toggle on" onclick="this.classList.toggle('on');notify(this.classList.contains('on')?'✓ Outreach on':'⏸ Outreach off')"></button></div>
+              <div class="toggle-row"><div class="toggle-info"><h4>Weekly Market Reports</h4><p>Generate and send reports every Monday</p></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+              <div class="toggle-row"><div class="toggle-info"><h4>Client Notifications</h4><p>Auto-email clients when new leads arrive</p></div><button class="toggle" onclick="this.classList.toggle('on');notify(this.classList.contains('on')?'✓ Notifications on':'⏸ Notifications off')"></button></div>
+              <div class="toggle-row"><div class="toggle-info"><h4>SEO Content Auto-Publish</h4><p>Publish AI content to client sites</p></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+              <div class="toggle-row"><div class="toggle-info"><h4>Social Media Auto-Post</h4><p>Post to LinkedIn/Instagram daily</p></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">🔑 API Keys</div></div>
+            <div class="card-body">
+              <label class="f-label">Anthropic API Key</label>
+              <input type="password" class="f-input" id="autoAnthropic" placeholder="sk-ant-api03-...">
+              <label class="f-label">Stripe Publishable Key</label>
+              <input type="text" class="f-input" id="autoStripe" placeholder="pk_live_...">
+              <label class="f-label">Stripe — Starter Plan Link</label>
+              <input type="text" class="f-input" id="autoLinkS" placeholder="https://buy.stripe.com/...">
+              <label class="f-label">Stripe — Growth Plan Link</label>
+              <input type="text" class="f-input" id="autoLinkG" placeholder="https://buy.stripe.com/...">
+              <label class="f-label">Stripe — Enterprise Plan Link</label>
+              <input type="text" class="f-input" id="autoLinkE" placeholder="https://buy.stripe.com/...">
+              <button class="btn btn-navy" onclick="saveFromAuto()">✓ Save All Keys</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY -->
+      <div class="page" id="ap-activity">
+        <div class="page-head"><h2>Live Activity Feed</h2><button class="btn btn-outline btn-sm" onclick="notify('✓ All marked as read','blue')">Mark all read</button></div>
+        <div class="card"><div class="card-body" style="padding:0 20px">
+          <div class="act-item"><div class="act-icon" style="background:var(--blue-pale)">🎯</div><div><div class="act-text"><strong>Lead Scout</strong> found 12 new HOT leads in Singapore (PropNex, ERA, OrangeTee)</div><div class="act-time">2 minutes ago</div></div></div>
+          <div class="act-item"><div class="act-icon" style="background:var(--green-pale)">✉️</div><div><div class="act-text"><strong>Outreach Agent</strong> sent 45 personalised cold emails to Dubai agents</div><div class="act-time">8 minutes ago</div></div></div>
+          <div class="act-item"><div class="act-icon" style="background:var(--amber-pale)">📊</div><div><div class="act-text"><strong>Analytics Agent</strong> generated weekly Dubai market report — 23 pages</div><div class="act-time">23 minutes ago</div></div></div>
+          <div class="act-item"><div class="act-icon" style="background:#FDF4FF">💰</div><div><div class="act-text">New subscription activated: <strong>Savills Singapore</strong> — Growth plan €1,197</div><div class="act-time">1 hour ago</div></div></div>
+          <div class="act-item"><div class="act-icon" style="background:var(--green-pale)">🛠️</div><div><div class="act-text"><strong>Dev Agent</strong> completed update Lead Score Engine v2.0 — deployed to production</div><div class="act-time">2 hours ago</div></div></div>
+          <div class="act-item"><div class="act-icon" style="background:var(--blue-pale)">🌐</div><div><div class="act-text"><strong>SEO Agent</strong> published 8 property articles for Corcoran Group campaign</div><div class="act-time">3 hours ago</div></div></div>
+        </div></div>
+      </div>
+
+    </div><!-- /dash-body -->
+  </div><!-- /dash-main -->
+</div><!-- /admin -->
+
+<!-- ═══════════════════════════════════════════════════════
+     VIEW 3 — CLIENT PORTAL
+═══════════════════════════════════════════════════════ -->
+<div id="client" class="view">
+
+  <div class="dash-sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name"><div class="sb-logo-dot"></div>Daltons AI</div>
+      <div class="sb-role sb-role-client">◈ Client Portal</div>
+    </div>
+    <div class="sb-section">My Account</div>
+    <div class="sb-item on" onclick="cPage('c_overview',this)"><span class="ic">🏠</span>Overview</div>
+    <div class="sb-item" onclick="cPage('c_leads',this)"><span class="ic">🎯</span>My Leads<span class="sb-badge" id="clientLeadBadge">3</span></div>
+    <div class="sb-item" onclick="cPage('c_services',this)"><span class="ic">⚡</span>My Services</div>
+    <div class="sb-item" onclick="cPage('c_research',this)"><span class="ic">📊</span>Market Reports</div>
+    <div class="sb-section">AI Tools</div>
+    <div class="sb-item" onclick="cPage('c_chat',this)"><span class="ic">🤖</span>AI Assistant</div>
+    <div class="sb-item" onclick="cPage('c_buyleads',this)"><span class="ic">🛒</span>Buy More Leads</div>
+    <div class="sb-section">Account</div>
+    <div class="sb-item" onclick="cPage('c_subscription',this)"><span class="ic">💳</span>Subscription</div>
+    <div class="sb-item" onclick="showView('landing')"><span class="ic">←</span>Back to Site</div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar" style="background:#2563EB">🏢</div>
+        <div><div class="sb-name">PropNex Realty</div><div class="sb-email">Growth Plan</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-main">
+    <div class="dash-topbar">
+      <div class="dash-title" id="clientTitle">Overview</div>
+      <div class="dash-topbar-r">
+        <div class="icon-btn" onclick="notify('📬 3 new lead notifications','blue')">🔔<div class="dot"></div></div>
+        <button class="btn btn-amber btn-sm" onclick="cPage('c_buyleads',null)">+ Buy Leads</button>
+      </div>
+    </div>
+
+    <div class="dash-body">
+
+      <!-- OVERVIEW -->
+      <div class="page on" id="cp-c_overview">
+        <div class="sub-banner">
+          <div class="sub-plan-name">Growth Plan — Active</div>
+          <div class="sub-title-line">PropNex Realty</div>
+          <div class="sub-exp">Subscription expires 31 May 2025 · 82 days remaining</div>
+          <div class="sub-feats">
+            <div class="sub-feat">✓ 7 AI Agents</div>
+            <div class="sub-feat">✓ 50 leads/month</div>
+            <div class="sub-feat">✓ Outreach Automation</div>
+            <div class="sub-feat">✓ Weekly reports</div>
+            <div class="sub-feat">✓ Social Media Agent</div>
+          </div>
+        </div>
+        <div class="grid-4 mb20">
+          <div class="metric"><div class="metric-label">Leads Received</div><div class="metric-val">38/50</div><div class="metric-sub">12 remaining</div></div>
+          <div class="metric"><div class="metric-label">Email Open Rate</div><div class="metric-val">34.2%</div><div class="metric-sub up">↑ Above average</div></div>
+          <div class="metric"><div class="metric-label">SEO Articles</div><div class="metric-val">16</div><div class="metric-sub up">↑ 4 this week</div></div>
+          <div class="metric"><div class="metric-label">Reports Ready</div><div class="metric-val">4</div><div class="metric-sub">1 new available</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><div class="card-head"><div class="card-title">⚡ Recent Activity</div></div><div class="card-body" style="padding:0 16px">
+            <div class="act-item"><div class="act-icon" style="background:var(--blue-pale)">🎯</div><div><div class="act-text">3 new <strong>Singapore leads</strong> ready in your dashboard</div><div class="act-time">1 hour ago</div></div></div>
+            <div class="act-item"><div class="act-icon" style="background:var(--green-pale)">✉️</div><div><div class="act-text"><strong>Outreach campaign</strong> completed — 12 responses received</div><div class="act-time">Yesterday</div></div></div>
+            <div class="act-item"><div class="act-icon" style="background:var(--amber-pale)">📊</div><div><div class="act-text"><strong>Singapore Q1 report</strong> generated and ready</div><div class="act-time">2 days ago</div></div></div>
+          </div></div>
+          <div class="card"><div class="card-head"><div class="card-title">🎯 Lead Usage</div></div><div class="card-body">
+            <div style="text-align:center;margin-bottom:16px">
+              <div style="font-family:var(--serif);font-size:52px;color:var(--navy);line-height:1">38<span style="font-size:22px;color:var(--slate400)">/50</span></div>
+              <div style="font-size:12px;color:var(--slate400)">Leads used this month</div>
+            </div>
+            <div class="progress-track" style="height:8px"><div class="progress-fill" style="width:76%;height:8px"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--slate400);margin-top:6px"><span>0</span><span>12 left</span><span>50</span></div>
+            <button class="btn btn-navy" style="width:100%;margin-top:16px" onclick="cPage('c_buyleads',null)">+ Buy Extra Leads</button>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- MY LEADS -->
+      <div class="page" id="cp-c_leads">
+        <div class="page-head"><h2>My Leads</h2><button class="btn btn-navy btn-sm" onclick="cPage('c_buyleads',null)">+ Buy More</button></div>
+        <div class="card"><table class="tbl">
+          <tr><th>Company</th><th>Contact</th><th>Market</th><th>Type</th><th>Score</th><th>Received</th><th>Action</th></tr>
+          <tr><td><strong>ERA Real Estate</strong></td><td>James Lim — MD</td><td>🇸🇬</td><td><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></td><td>91/100</td><td>Today</td><td><button class="btn btn-navy btn-sm" onclick="notify('📧 Email template generated for ERA','green')">Send Email</button></td></tr>
+          <tr><td><strong>OrangeTee & Tie</strong></td><td>Rachel Ng — CEO</td><td>🇸🇬</td><td><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></td><td>87/100</td><td>Yesterday</td><td><button class="btn btn-navy btn-sm" onclick="notify('📧 Email template generated','green')">Send Email</button></td></tr>
+          <tr><td><strong>Gulf Sotheby's</strong></td><td>Ahmed Al-Rashid</td><td>🇦🇪</td><td><span class="pill pill-amber"><span class="pill-dot"></span>WARM</span></td><td>74/100</td><td>2 days ago</td><td><button class="btn btn-navy btn-sm" onclick="notify('📧 Email template generated','green')">Send Email</button></td></tr>
+          <tr><td><strong>Savills Singapore</strong></td><td>John Chen — Dir.</td><td>🇸🇬</td><td><span class="pill pill-blue"><span class="pill-dot"></span>NEW</span></td><td>68/100</td><td>3 days ago</td><td><button class="btn btn-navy btn-sm" onclick="notify('📧 Email template generated','green')">Send Email</button></td></tr>
+        </table></div>
+      </div>
+
+      <!-- MY SERVICES -->
+      <div class="page" id="cp-c_services">
+        <div class="page-head"><h2>My Active Services</h2></div>
+        <div class="grid-3">
+          <div class="card"><div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:24px">🎯</span><span class="pill pill-green"><span class="pill-dot"></span>Active</span></div>
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">Lead Generator Pro</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65">Scans LinkedIn, portals and databases daily for qualified real estate leads.</p>
+            <div class="progress-wrap"><div class="progress-row"><span>Month usage</span><span>38/50</span></div><div class="progress-track"><div class="progress-fill" style="width:76%"></div></div></div>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:24px">✉️</span><span class="pill pill-amber"><span class="pill-dot"></span>Running</span></div>
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">Outreach Automation</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65">Active Dubai campaign. 45 emails sent, 12 responses received (26.7% rate).</p>
+            <div class="progress-wrap"><div class="progress-row"><span>Response rate</span><span>26.7%</span></div><div class="progress-track"><div class="progress-fill" style="width:27%;background:linear-gradient(90deg,var(--green),#34D399)"></div></div></div>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:24px">🌐</span><span class="pill pill-green"><span class="pill-dot"></span>Active</span></div>
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">SEO Content Engine</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65">16 articles published. "Singapore luxury condo 2025" now ranking position 8.</p>
+            <div class="progress-wrap"><div class="progress-row"><span>Monthly target</span><span>16/20</span></div><div class="progress-track"><div class="progress-fill" style="width:80%"></div></div></div>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:24px">📱</span><span class="pill pill-green"><span class="pill-dot"></span>Active</span></div>
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">Social Media Agent</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65">Daily posts on LinkedIn and Instagram. Avg 340 views per post this month.</p>
+            <div class="progress-wrap"><div class="progress-row"><span>Posts this month</span><span>28/30</span></div><div class="progress-track"><div class="progress-fill" style="width:93%"></div></div></div>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:24px">📊</span><span class="pill pill-green"><span class="pill-dot"></span>Active</span></div>
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">Market Research AI</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65">Weekly reports for Singapore, Dubai and NYC available in your reports section.</p>
+            <div class="progress-wrap"><div class="progress-row"><span>Reports ready</span><span>4</span></div><div class="progress-track"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,var(--green),#34D399)"></div></div></div>
+          </div></div>
+          <div class="card" style="border:1.5px dashed var(--slate200);background:var(--slate50);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px">
+            <div style="font-size:32px;margin-bottom:10px">➕</div>
+            <h4 style="font-size:14px;font-weight:700;color:var(--slate500)">Add Service</h4>
+            <p style="font-size:12px;color:var(--slate400);margin:6px 0 14px">Upgrade or add a service</p>
+            <button class="btn btn-navy btn-sm" onclick="notify('💳 Upgrade page opened','blue')">View Plans</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARKET REPORTS -->
+      <div class="page" id="cp-c_research">
+        <div class="page-head"><h2>My Market Reports</h2><button class="btn btn-navy btn-sm" onclick="notify('📊 Report requested','green')">+ Request Report</button></div>
+        <div class="grid-2">
+          <div class="card" style="cursor:pointer" onclick="notify('📖 Report opened as PDF','blue')"><div class="card-body">
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🇸🇬 Singapore Luxury Condo Q1 2025</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:12px">Analysis of 847 transactions in Orchard, Marina Bay and Sentosa Cove. Includes price trends, demand/supply ratio and investor profile.</p>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill pill-green"><span class="pill-dot"></span>Available</span><span style="font-size:12px;color:var(--blue)">📥 Download PDF</span></div>
+          </div></div>
+          <div class="card" style="cursor:pointer" onclick="notify('📖 Report opened as PDF','blue')"><div class="card-body">
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🇸🇬 Singapore HDB vs Private 2025</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:12px">Comparative analysis. Private property demand up 8% YoY. Foreign buyer share 12%. Recommendations for your pipeline.</p>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill pill-green"><span class="pill-dot"></span>Available</span><span style="font-size:12px;color:var(--blue)">📥 Download PDF</span></div>
+          </div></div>
+          <div class="card"><div class="card-body">
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🇦🇪 Dubai Off-Plan Competitor Analysis</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:12px">Analysis of top 20 property agents in Dubai. Market share and digital presence compared.</p>
+            <span class="pill pill-amber"><span class="pill-dot"></span>Generating now...</span>
+          </div></div>
+          <div class="card" style="cursor:pointer" onclick="notify('📖 Report opened as PDF','blue')"><div class="card-body">
+            <h4 style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">🌏 Asia-Pacific PropTech 2025</h4>
+            <p style="font-size:12px;color:var(--slate500);line-height:1.65;margin-bottom:12px">AI and tech adoption in real estate per market. Singapore leading, Tokyo following. Opportunities for early movers.</p>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill pill-green"><span class="pill-dot"></span>Available</span><span style="font-size:12px;color:var(--blue)">📥 Download PDF</span></div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- AI ASSISTANT -->
+      <div class="page" id="cp-c_chat">
+        <div class="page-head"><h2>AI Assistant — Your Dedicated Agent</h2></div>
+        <div class="card" style="max-width:800px">
+          <div class="card-head"><div class="card-title">🤖 PropNex Dedicated AI</div><span class="pill pill-green"><span class="pill-dot"></span>Online</span></div>
+          <div class="chat-wrap">
+            <div class="chat-msgs" id="clientChatMsgs" style="height:440px"></div>
+            <div class="chat-input-bar">
+              <textarea class="chat-in" id="clientChatIn" rows="1" placeholder="Ask about your leads, market, or request an action plan..." onkeydown="handleKey(event,'clientChat')" oninput="autoResize(this)"></textarea>
+              <button class="chat-send" id="clientChatSend" onclick="sendClientMsg()">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUY LEADS -->
+      <div class="page" id="cp-c_buyleads">
+        <div class="page-head"><h2>Lead Marketplace</h2><span style="font-size:13px;color:var(--slate400)">247 leads available</span></div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">🎯 Available Leads</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-navy btn-sm" style="font-size:11px" onclick="notify('🔍 Filtered: Singapore','blue')">🇸🇬 SG</button>
+              <button class="btn btn-outline btn-sm" style="font-size:11px" onclick="notify('🔍 Filtered: Dubai','blue')">🇦🇪 AE</button>
+              <button class="btn btn-outline btn-sm" style="font-size:11px" onclick="notify('🔍 Filtered: New York','blue')">🇺🇸 NYC</button>
+            </div>
+          </div>
+          <table class="tbl">
+            <tr><th>Company</th><th>Market</th><th>Type</th><th>Score</th><th>Price</th><th>Buy</th></tr>
+            <tr><td><strong>ERA Real Estate SG</strong><br><small>Sarah Tan — Head of Sales</small></td><td>🇸🇬</td><td><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></td><td>96/100</td><td><strong>€49</strong></td><td><button class="buy-btn" onclick="openLeadPurchase('ERA Real Estate','Sarah Tan — Head of Sales','Singapore','96',49)">Buy €49</button></td></tr>
+            <tr><td><strong>OrangeTee Realty</strong><br><small>Michael Koh — Director</small></td><td>🇸🇬</td><td><span class="pill pill-red"><span class="pill-dot"></span>HOT</span></td><td>88/100</td><td><strong>€49</strong></td><td><button class="buy-btn" onclick="openLeadPurchase('OrangeTee Realty','Michael Koh','Singapore','88',49)">Buy €49</button></td></tr>
+            <tr><td><strong>CBRE Dubai</strong><br><small>Omar Khalidi — MD</small></td><td>🇦🇪</td><td><span class="pill pill-amber"><span class="pill-dot"></span>WARM</span></td><td>79/100</td><td><strong>€29</strong></td><td><button class="buy-btn" onclick="openLeadPurchase('CBRE Dubai','Omar Khalidi — MD','Dubai','79',29)">Buy €29</button></td></tr>
+            <tr><td><strong>JLL Singapore</strong><br><small>Lisa Wong — VP</small></td><td>🇸🇬</td><td><span class="pill pill-amber"><span class="pill-dot"></span>WARM</span></td><td>73/100</td><td><strong>€29</strong></td><td><button class="buy-btn" onclick="openLeadPurchase('JLL Singapore','Lisa Wong — VP','Singapore','73',29)">Buy €29</button></td></tr>
+            <tr><td><strong>Douglas Elliman NYC</strong><br><small>Robert Myers — CEO</small></td><td>🇺🇸</td><td><span class="pill pill-blue"><span class="pill-dot"></span>NEW</span></td><td>65/100</td><td><strong>€19</strong></td><td><button class="buy-btn" onclick="openLeadPurchase('Douglas Elliman','Robert Myers — CEO','New York','65',19)">Buy €19</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUBSCRIPTION -->
+      <div class="page" id="cp-c_subscription">
+        <div class="page-head"><h2>My Subscription</h2></div>
+        <div class="sub-banner mb20">
+          <div class="sub-plan-name">Growth Plan — 3-Month Contract</div>
+          <div class="sub-title-line">€1,197 per quarter</div>
+          <div class="sub-exp">Start: 01 March 2025 · Expires: 31 May 2025 · Monthly cancel-or-renew after</div>
+          <div class="sub-feats"><div class="sub-feat">✓ 7 AI Agents</div><div class="sub-feat">✓ 50 leads/mo</div><div class="sub-feat">✓ Outreach + Social</div><div class="sub-feat">✓ Weekly reports</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><div class="card-head"><div class="card-title">Upgrade to Enterprise</div></div><div class="card-body">
+            <div style="font-family:var(--serif);font-size:44px;color:var(--navy);margin-bottom:4px">€2,997 <span style="font-family:var(--sans);font-size:15px;font-weight:400;color:var(--slate400)">/3 months</span></div>
+            <p style="font-size:13px;color:var(--slate500);margin-bottom:16px">All 13 agents, 200 leads/mo, daily reports, CRM integration and priority support.</p>
+            <button class="btn btn-amber" style="width:100%" onclick="stripePay('enterprise')">Upgrade — €2,997</button>
+          </div></div>
+          <div class="card"><div class="card-head"><div class="card-title">Invoice History</div></div><div class="card-body" style="padding:0 16px">
+            <div style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--slate100);font-size:13px"><strong>01 Mar 2025 — Growth Q1</strong><span style="color:var(--green);font-weight:700">€1,197 ✓</span></div>
+            <div style="display:flex;justify-content:space-between;padding:13px 0;font-size:13px;color:var(--slate400)"><span>Next invoice: 01 Jun 2025</span><span>€1,197</span></div>
+          </div></div>
+        </div>
+      </div>
+
+    </div><!-- /dash-body -->
+  </div><!-- /dash-main -->
+</div><!-- /client -->
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── CONFIG (persisted to localStorage) ──────────────────────
+const CFG = {
+  get anthropic()   { return localStorage.getItem('dai_anthropic') || ''; },
+  set anthropic(v)  { localStorage.setItem('dai_anthropic', v); },
+  get stripe()      { return localStorage.getItem('dai_stripe') || ''; },
+  set stripe(v)     { localStorage.setItem('dai_stripe', v); },
+  get linkStarter() { return localStorage.getItem('dai_link_starter') || ''; },
+  set linkStarter(v){ localStorage.setItem('dai_link_starter', v); },
+  get linkGrowth()  { return localStorage.getItem('dai_link_growth') || ''; },
+  set linkGrowth(v) { localStorage.setItem('dai_link_growth', v); },
+  get linkEnterprise(){ return localStorage.getItem('dai_link_enterprise') || ''; },
+  set linkEnterprise(v){ localStorage.setItem('dai_link_enterprise', v); },
+};
+
+// ── AGENT DEFINITIONS ────────────────────────────────────────
+const AGENTS = {
+  ceo: { name:'CEO Agent', icon:'👑',
+    sys:`You are the CEO Agent of Daltons AI B.V. (KVK: 97688835). You are an experienced Fortune 500 CEO coordinating all departments. The founder/chairman is a non-technical entrepreneur who relies on you for all operational and strategic decisions. Give concrete, executive-level advice. Respond in the same language as the question.` },
+  cto: { name:'CTO Agent', icon:'⚡',
+    sys:`You are the CTO Agent of Daltons AI B.V. Give tech advice at CTO-level but explain it so a non-technical founder understands. Respond in the same language as the question.` },
+  cfo: { name:'CFO Agent', icon:'💰',
+    sys:`You are the CFO Agent of Daltons AI B.V. Give financial advice: SaaS metrics, Dutch tax, investor relations, cashflow. Respond in the same language as the question.` },
+  cmo: { name:'CMO Agent', icon:'📣',
+    sys:`You are the CMO Agent of Daltons AI B.V. Marketing strategy for AI SaaS in real estate. Markets: Singapore, Dubai, NYC. Give concrete plans. Respond in the same language as the question.` },
+  cso: { name:'CSO Agent', icon:'🎯',
+    sys:`You are the CSO Agent of Daltons AI B.V. Enterprise sales for AI SaaS, real estate focus. Give scripts, deal structures, pipeline advice. Respond in the same language as the question.` },
+  legal: { name:'Legal Agent', icon:'⚖️',
+    sys:`You are the Legal Agent of Daltons AI B.V. Dutch law, GDPR/AVG, SaaS contracts. Note: this is informational, not binding legal advice. Respond in the same language as the question.` },
+  product: { name:'Product Agent', icon:'🧠',
+    sys:`You are the Product Agent of Daltons AI B.V. AI SaaS product management, roadmaps, user research. Respond in the same language as the question.` },
+  hr: { name:'HR Agent', icon:'👥',
+    sys:`You are the HR Agent of Daltons AI B.V. Talent, culture, Dutch employment law, remote teams. Respond in the same language as the question.` },
+  devops: { name:'DevOps Agent', icon:'🔧',
+    sys:`You are the DevOps Agent of Daltons AI B.V. Cloud infrastructure, CI/CD, monitoring for AI apps. Respond in the same language as the question.` },
+  leadscout: { name:'Lead Scout', icon:'🔍',
+    sys:`You are the Lead Scout of Daltons AI B.V. B2B lead generation for real estate AI SaaS across Singapore, Dubai, NYC, Tokyo, Hong Kong. Give prospect lists, qualification criteria, outreach strategies. Respond in the same language as the question.` },
+  outreach: { name:'Outreach Agent', icon:'✉️',
+    sys:`You are the Outreach Agent of Daltons AI B.V. Write high-converting B2B cold email sequences and LinkedIn messages for real estate prospects. Respond in the same language as the question.` },
+  analytics: { name:'Analytics', icon:'📊',
+    sys:`You are the Analytics Agent of Daltons AI B.V. SaaS analytics, KPIs, BI frameworks. Give concrete metrics setups. Respond in the same language as the question.` },
+  seo: { name:'SEO Agent', icon:'🌐',
+    sys:`You are the SEO Agent of Daltons AI B.V. B2B SaaS SEO, content marketing for real estate. Keyword lists, content calendars. Respond in the same language as the question.` },
+  dev: { name:'AI Developer', icon:'🛠️',
+    sys:`You are the AI Expert Developer Agent of Daltons AI B.V. You build and improve AI-powered SaaS services for the real estate sector and conduct market research.
+You: analyse market opportunities, choose profitable services to build, write service descriptions and specs, conduct market research with data-driven insights, advise on pricing and positioning.
+Context: Daltons AI B.V., KVK 97688835. Markets: Singapore, Dubai, NYC, Tokyo, HK. Product: AI SaaS factory for real estate agents and property developers.
+Be concrete, data-driven, and actionable. Respond in the same language as the question.` },
+  research: { name:'Research Agent', icon:'🔬',
+    sys:`You are the Market Research AI Agent of Daltons AI B.V. You analyse real estate markets worldwide and generate detailed market reports. Always include: market size, trends, price development, supply/demand, investor profile, and concrete recommendations. Respond in the same language as the question.` },
+  client_ai: { name:'PropNex AI', icon:'🤖',
+    sys:`You are a dedicated AI assistant for PropNex Realty, a client of Daltons AI B.V. Help them with: lead follow-up strategies, Singapore/Dubai market insights, email templates, sales scripts, and questions about their services. They are on the Growth Plan (50 leads/month, 7 agents). Be helpful, proactive, and specific to real estate. Respond in the same language as the question.` },
+};
+
+// ── CONVERSATION STATE ───────────────────────────────────────
+const state = {
+  adminAgent: null,
+  adminConvos: {},
+  devConvo: [],
+  resConvo: [],
+  clientConvo: [],
+  adminLoading: false,
+  devLoading: false,
+  resLoading: false,
+  clientLoading: false,
+  currentLead: null,
+};
+
+// ── VIEW NAVIGATION ──────────────────────────────────────────
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if (id === 'admin') { initAdminCharts(); initAdminAgentBar(); }
+  if (id === 'client') { initClientChat(); }
+}
+function goAdmin()  { showView('admin'); }
+function goClient() { showView('client'); }
+
+// ── ADMIN PAGES ──────────────────────────────────────────────
+function aPage(id, el) {
+  document.querySelectorAll('#admin .page').forEach(p => p.classList.remove('on'));
+  const pg = document.getElementById('ap-' + id);
+  if (pg) pg.classList.add('on');
+  document.querySelectorAll('#admin .sb-item').forEach(i => i.classList.remove('on'));
+  if (el) el.classList.add('on');
+  const titles = { overview:'Dashboard', activity:'Live Activity', agents:'Agent Control', aidev:'AI Developer', clients:'Clients', leads_mgr:'Leads Manager', research:'Market Research', revenue:'Revenue', automation:'Automation' };
+  const t = document.getElementById('adminTitle');
+  if (t) t.textContent = titles[id] || id;
+  if (id === 'agents') initAdminAgentBar();
+  if (id === 'aidev')  initDevChat();
+  if (id === 'research') initResChat();
+}
+
+// ── CLIENT PAGES ─────────────────────────────────────────────
+function cPage(id, el) {
+  document.querySelectorAll('#client .page').forEach(p => p.classList.remove('on'));
+  const pg = document.getElementById('cp-' + id);
+  if (pg) pg.classList.add('on');
+  document.querySelectorAll('#client .sb-item').forEach(i => i.classList.remove('on'));
+  if (el) el.classList.add('on');
+  const titles = { c_overview:'Overview', c_leads:'My Leads', c_services:'My Services', c_research:'Market Reports', c_chat:'AI Assistant', c_buyleads:'Buy Leads', c_subscription:'Subscription' };
+  const t = document.getElementById('clientTitle');
+  if (t) t.textContent = titles[id] || id;
+  const badge = document.getElementById('clientLeadBadge');
+  if (badge) badge.textContent = '0';
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.remove('off'); }
+function closeModal(id) { document.getElementById(id).classList.add('off'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.add('off'); });
+});
+
+// ── SETTINGS ─────────────────────────────────────────────────
+function openModal(id) {
+  if (id === 'settingsModal') {
+    document.getElementById('cfgAnthropic').value   = CFG.anthropic;
+    document.getElementById('cfgStripe').value      = CFG.stripe;
+    document.getElementById('cfgLinkStarter').value = CFG.linkStarter;
+    document.getElementById('cfgLinkGrowth').value  = CFG.linkGrowth;
+    document.getElementById('cfgLinkEnterprise').value = CFG.linkEnterprise;
+  }
+  document.getElementById(id).classList.remove('off');
+}
+function saveSettings() {
+  CFG.anthropic    = document.getElementById('cfgAnthropic').value.trim();
+  CFG.stripe       = document.getElementById('cfgStripe').value.trim();
+  CFG.linkStarter  = document.getElementById('cfgLinkStarter').value.trim();
+  CFG.linkGrowth   = document.getElementById('cfgLinkGrowth').value.trim();
+  CFG.linkEnterprise = document.getElementById('cfgLinkEnterprise').value.trim();
+  closeModal('settingsModal');
+  updateApiStatus();
+  notify('✓ Settings saved — AI agents are live', 'green');
+  // reset all chats so they start fresh with live AI
+  state.adminConvos = {}; state.devConvo = []; state.resConvo = []; state.clientConvo = [];
+}
+function saveFromAuto() {
+  CFG.anthropic    = document.getElementById('autoAnthropic').value.trim();
+  CFG.stripe       = document.getElementById('autoStripe').value.trim();
+  CFG.linkStarter  = document.getElementById('autoLinkS').value.trim();
+  CFG.linkGrowth   = document.getElementById('autoLinkG').value.trim();
+  CFG.linkEnterprise = document.getElementById('autoLinkE').value.trim();
+  updateApiStatus();
+  notify('✓ All keys saved', 'green');
+}
+function updateApiStatus() {
+  const btn = document.getElementById('apiStatusBtn');
+  const txt = document.getElementById('apiStatusTxt');
+  if (!btn || !txt) return;
+  if (CFG.anthropic.startsWith('sk-')) {
+    btn.classList.add('live');
+    txt.textContent = 'API Live';
+  } else {
+    btn.classList.remove('live');
+    txt.textContent = 'Configure API';
+  }
+}
+
+// ── STRIPE ───────────────────────────────────────────────────
+function stripePay(plan) {
+  const links = { starter: CFG.linkStarter, growth: CFG.linkGrowth, enterprise: CFG.linkEnterprise };
+  const prices = { starter:'€497', growth:'€1,197', enterprise:'€2,997' };
+  const url = links[plan];
+  if (url && url.startsWith('http')) {
+    window.open(url, '_blank');
+    notify('🔗 Opening Stripe Checkout...', 'blue');
+  } else {
+    notify('⚙ Set your Stripe payment links in Settings first', 'amber');
+    openModal('settingsModal');
+  }
+}
+
+let pendingLead = null;
+function openLeadPurchase(company, contact, market, score, price) {
+  pendingLead = { company, contact, market, score, price };
+  document.getElementById('stripeModalSub').textContent = `You are purchasing a qualified real estate lead from ${market}.`;
+  document.getElementById('stripeLeadPreview').innerHTML = `<strong>${company}</strong><br>${contact}<br>Market: ${market} · Score: ${score}/100`;
+  document.getElementById('stripePayAmt').textContent = `€${price}`;
+  openModal('stripeModal');
+}
+function processLeadPayment() {
+  const email = document.getElementById('stripeEmail').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('stripeEmail').classList.add('err');
+    notify('Please enter a valid email address', 'red');
+    return;
+  }
+  document.getElementById('stripeEmail').classList.remove('err');
+  if (CFG.linkStarter.startsWith('http')) {
+    window.open(CFG.linkStarter + `?prefilled_email=${encodeURIComponent(email)}`, '_blank');
+  }
+  closeModal('stripeModal');
+  notify(`✓ Lead purchased: ${pendingLead?.company} — check your email`, 'green');
+}
+
+// ── API CALL ─────────────────────────────────────────────────
+async function callAI(agentKey, messages) {
+  const agent = AGENTS[agentKey];
+  if (!CFG.anthropic.startsWith('sk-')) return simulateReply(agentKey);
+  try {
+    const hist = messages.slice(-14).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': CFG.anthropic, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: agent.sys, messages: hist })
+    });
+    const data = await res.json();
+    if (data.content?.[0]?.text) return data.content[0].text;
+    if (data.error) return `⚠️ API Error: ${data.error.message}`;
+    return 'No response received.';
+  } catch (e) { return `⚠️ Connection error: ${e.message}`; }
+}
+
+function simulateReply(agentKey) {
+  const a = AGENTS[agentKey];
+  if (agentKey === 'dev') return `**AI Developer Agent** 🛠️\n\nDemo mode active. Add your Anthropic API key in **⚙ Settings** to enable live AI responses.\n\nIn live mode I build and improve services, conduct market research, and identify revenue opportunities automatically.`;
+  if (agentKey === 'research') return `**Research Agent** 🔬\n\nDemo mode. Add your API key in **⚙ Settings** for live market analyses.\n\nI generate real-time market reports for Singapore, Dubai, NYC, Tokyo, and Hong Kong.`;
+  if (agentKey === 'client_ai') return `Welcome back, PropNex Realty! 👋\n\nI'm your dedicated AI assistant. Set your **Anthropic API key** via Admin → Settings for live responses.\n\nI'm here to help with leads, market insights, email templates, and more!`;
+  return `**${a.name}** — Demo mode. Go to **⚙ Settings** in the admin panel and add your Anthropic API key to activate live AI.`;
+}
+
+// ── CHAT RENDERER ────────────────────────────────────────────
+function renderMsgs(convo, containerId, agentKey) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const agent = AGENTS[agentKey] || { icon: '🤖', name: 'Agent' };
+  // Skip init prompts
+  const msgs = convo.filter((m, i) => {
+    if (m.role === 'user' && m._init) return false;
+    return true;
+  });
+  const typing = el.querySelector('.typing-wrap');
+  el.innerHTML = msgs.map(m => {
+    const isMe = m.role === 'user';
+    const content = isMe ? esc(m.content) : md(m.content);
+    return `<div class="cmsg ${isMe ? 'me' : 'ai'}">
+      <div class="cmsg-av ${isMe ? 'me' : ''}">${isMe ? '👤' : agent.icon}</div>
+      <div class="cmsg-inner">
+        <div class="cmsg-name">${isMe ? 'You' : agent.name}</div>
+        <div class="cmsg-bubble">${content}</div>
+      </div>
+    </div>`;
+  }).join('');
+  if (typing) el.appendChild(typing);
+  el.scrollTop = el.scrollHeight;
+}
+
+function showTyping(containerId, icon) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const d = document.createElement('div');
+  d.className = 'cmsg ai typing-wrap';
+  d.innerHTML = `<div class="cmsg-av">${icon}</div><div class="cmsg-inner"><div class="cmsg-name">Thinking…</div><div class="cmsg-bubble"><div class="typing-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div></div></div>`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+function hideTyping(containerId) {
+  const el = document.getElementById(containerId);
+  const t = el?.querySelector('.typing-wrap');
+  if (t) t.remove();
+}
+
+async function kickoff(agentKey, initPrompt, convo, msgsId, sendBtnId, loadingKey) {
+  if (convo.length > 0) { renderMsgs(convo, msgsId, agentKey); return; }
+  const a = AGENTS[agentKey];
+  const initMsg = { role: 'user', content: initPrompt, _init: true };
+  convo.push(initMsg);
+  showTyping(msgsId, a.icon);
+  state[loadingKey] = true;
+  if (sendBtnId) document.getElementById(sendBtnId).disabled = true;
+  const reply = await callAI(agentKey, convo);
+  hideTyping(msgsId);
+  convo.push({ role: 'assistant', content: reply });
+  state[loadingKey] = false;
+  if (sendBtnId) document.getElementById(sendBtnId).disabled = false;
+  renderMsgs(convo, msgsId, agentKey);
+}
+
+async function sendMsg(agentKey, inputId, msgsId, sendBtnId, loadingKey, convo) {
+  const inp = document.getElementById(inputId);
+  const txt = inp.value.trim();
+  if (!txt || state[loadingKey]) return;
+  inp.value = ''; inp.style.height = 'auto';
+  convo.push({ role: 'user', content: txt });
+  renderMsgs(convo, msgsId, agentKey);
+  showTyping(msgsId, AGENTS[agentKey].icon);
+  state[loadingKey] = true;
+  document.getElementById(sendBtnId).disabled = true;
+  const reply = await callAI(agentKey, convo);
+  hideTyping(msgsId);
+  convo.push({ role: 'assistant', content: reply });
+  state[loadingKey] = false;
+  document.getElementById(sendBtnId).disabled = false;
+  renderMsgs(convo, msgsId, agentKey);
+}
+
+// ADMIN AGENT CHAT
+function initAdminAgentBar() {
+  const bar = document.getElementById('adminAgentBar');
+  if (!bar || bar.children.length > 0) return;
+  const keys = ['ceo','cto','cfo','cmo','cso','legal','product','hr','devops','leadscout','outreach','analytics','seo'];
+  bar.innerHTML = keys.map(k => `<span class="a-chip" data-agent="${k}" onclick="selectAdminAgent('${k}',this)">${AGENTS[k].icon} ${AGENTS[k].name}</span>`).join('');
+}
+function selectAdminAgent(key, el) {
+  state.adminAgent = key;
+  document.querySelectorAll('#adminAgentBar .a-chip').forEach(c => c.classList.remove('on'));
+  if (el) el.classList.add('on');
+  const convo = state.adminConvos[key] = state.adminConvos[key] || [];
+  kickoff(key, `Give a brief 1-sentence intro and ask the Chairman what you can do for him today. Be direct and executive.`, convo, 'adminChatMsgs', 'adminChatSend', 'adminLoading');
+}
+function openAdminChat(key) {
+  aPage('agents', null);
+  setTimeout(() => {
+    initAdminAgentBar();
+    const chip = document.querySelector(`[data-agent="${key}"]`);
+    if (chip) selectAdminAgent(key, chip);
+  }, 60);
+}
+function sendAdminMsg() {
+  if (!state.adminAgent) { notify('Select an agent first'); return; }
+  const convo = state.adminConvos[state.adminAgent] = state.adminConvos[state.adminAgent] || [];
+  sendMsg(state.adminAgent, 'adminChatIn', 'adminChatMsgs', 'adminChatSend', 'adminLoading', convo);
+}
+
+// DEV CHAT
+function initDevChat() {
+  kickoff('dev', `Give a brief 1-sentence intro as AI Developer Agent and ask what service to build or what market to research today.`, state.devConvo, 'devChatMsgs', 'devChatSend', 'devLoading');
+}
+function sendDevMsg() {
+  sendMsg('dev', 'devChatIn', 'devChatMsgs', 'devChatSend', 'devLoading', state.devConvo);
+}
+
+// RESEARCH CHAT
+function initResChat() {
+  kickoff('research', `Give a brief 1-sentence intro and ask which market or topic to research today.`, state.resConvo, 'resChatMsgs', 'resChatSend', 'resLoading');
+}
+function sendResMsg() {
+  sendMsg('research', 'resChatIn', 'resChatMsgs', 'resChatSend', 'resLoading', state.resConvo);
+}
+
+// CLIENT CHAT
+function initClientChat() {
+  kickoff('client_ai', `Give a warm welcome to PropNex Realty as their dedicated AI assistant. Mention their Growth plan and ask how you can help their real estate business today.`, state.clientConvo, 'clientChatMsgs', 'clientChatSend', 'clientLoading');
+}
+function sendClientMsg() {
+  sendMsg('client_ai', 'clientChatIn', 'clientChatMsgs', 'clientChatSend', 'clientLoading', state.clientConvo);
+}
+
+// KEY HANDLERS
+function handleKey(e, type) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if (type === 'adminChat')  sendAdminMsg();
+    if (type === 'devChat')    sendDevMsg();
+    if (type === 'resChat')    sendResMsg();
+    if (type === 'clientChat') sendClientMsg();
+  }
+}
+
+// ── CHARTS ───────────────────────────────────────────────────
+function initAdminCharts() {
+  const rv = [32,48,55,67,43,78,90,85,112,98,125,110,143,130,158,145,172,160,185,175,198,188,214,202,228,215,240,232,260,275];
+  buildBar('adminRevenueChart', 'adminRevenueLabels', rv, null);
+  const mrr = [2400,2800,3200,3600,4100,4800,5400,6200,7100,8240];
+  buildBar('mrrChart', 'mrrLabels', mrr, ['Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar']);
+}
+function buildBar(chartId, labelsId, data, labels) {
+  const cEl = document.getElementById(chartId);
+  const lEl = document.getElementById(labelsId);
+  if (!cEl || !lEl) return;
+  const max = Math.max(...data);
+  cEl.innerHTML = data.map(v => `<div class="bar-c" style="height:${Math.max((v/max*100),4)}%" title="${v}"></div>`).join('');
+  if (labels) {
+    lEl.innerHTML = labels.map(l => `<div class="bar-lbl">${l}</div>`).join('');
+  } else {
+    const step = Math.ceil(data.length / 6);
+    lEl.innerHTML = data.map((_, i) => `<div class="bar-lbl">${i % step === 0 ? i+1 : ''}</div>`).join('');
+  }
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+let toastTimer;
+function notify(msg, type = 'default') {
+  const el = document.getElementById('toast');
+  const colors = { green:'#10B981', blue:'#2563EB', amber:'#F59E0B', red:'#EF4444', default:'#0F172A' };
+  el.style.background = colors[type] || colors.default;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3400);
+}
+
+// ── UTILS ────────────────────────────────────────────────────
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+function md(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em style="color:var(--blue)">$1</em>')
+    .replace(/`(.+?)`/g,'<code style="font-family:var(--mono);font-size:11px;background:var(--slate100);padding:1px 5px;border-radius:3px">$1</code>')
+    .replace(/^### (.+)$/gm,'<div style="font-weight:700;color:var(--navy);margin:10px 0 4px;font-size:14px">$1</div>')
+    .replace(/^## (.+)$/gm,'<div style="font-weight:700;color:var(--navy);margin:10px 0 4px;font-size:14px">$1</div>')
+    .replace(/^# (.+)$/gm,'<div style="font-weight:800;color:var(--navy);margin:10px 0 4px;font-size:15px">$1</div>')
+    .replace(/^- (.+)$/gm,'<div style="padding-left:14px;margin:2px 0">• $1</div>')
+    .replace(/^\d+\. (.+)$/gm,'<div style="padding-left:14px;margin:2px 0">$1</div>')
+    .replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  updateApiStatus();
+  // Pre-fill automation page fields
+  document.getElementById('autoAnthropic').value = CFG.anthropic;
+  document.getElementById('autoStripe').value    = CFG.stripe;
+  document.getElementById('autoLinkS').value     = CFG.linkStarter;
+  document.getElementById('autoLinkG').value     = CFG.linkGrowth;
+  document.getElementById('autoLinkE').value     = CFG.linkEnterprise;
+});
+</script>
+</body>
+</html>
