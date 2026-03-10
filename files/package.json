@@ -1,8 +1,0 @@
-{
-  "name": "daltonsai",
-  "version": "1.0.0",
-  "description": "Daltons AI B.V. — AI Software Factory",
-  "dependencies": {
-    "stripe": "^14.0.0"
-  }
-}
