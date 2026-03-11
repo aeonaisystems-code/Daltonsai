@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Processing Agreement — Daltons AI B.V.</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#08090E;color:#fff;line-height:1.8;-webkit-font-smoothing:antialiased}
+.nav{background:rgba(8,9,14,.97);border-bottom:1px solid rgba(255,255,255,.08);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.logo{font-weight:700;font-size:18px;letter-spacing:-.3px}
+.logo span{color:#00C2FF}
+.back{font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .15s;border:1px solid rgba(255,255,255,.1);padding:6px 14px;border-radius:7px}
+.back:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+.container{max-width:780px;margin:0 auto;padding:64px 24px 80px}
+.badge{display:inline-block;background:rgba(0,208,132,.08);border:1px solid rgba(0,208,132,.2);color:#00D084;padding:5px 16px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:20px}
+h1{font-size:38px;font-weight:700;letter-spacing:-1.5px;margin-bottom:6px;line-height:1.1}
+.meta{font-size:13px;color:rgba(255,255,255,.35);margin-bottom:12px}
+.version{display:inline-flex;gap:16px;margin-bottom:48px;flex-wrap:wrap}
+.vtag{font-size:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:4px 12px;border-radius:6px;color:rgba(255,255,255,.45)}
+.intro-box{background:rgba(0,208,132,.05);border:1px solid rgba(0,208,132,.15);border-radius:12px;padding:22px 26px;margin-bottom:48px}
+.intro-box p{font-size:15px;color:rgba(255,255,255,.72);margin:0 0 10px;line-height:1.8}
+.intro-box p:last-child{margin:0}
+h2{font-size:19px;font-weight:700;color:#fff;margin:44px 0 14px;padding-top:36px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+h2 .sec-num{font-size:11px;font-weight:600;color:#00D084;background:rgba(0,208,132,.1);border:1px solid rgba(0,208,132,.2);padding:3px 10px;border-radius:5px;letter-spacing:.5px;flex-shrink:0}
+h2:first-of-type{border-top:none;padding-top:0;margin-top:0}
+h3{font-size:14px;font-weight:600;color:rgba(255,255,255,.8);margin:20px 0 8px;text-transform:uppercase;letter-spacing:.8px}
+p{font-size:15px;color:rgba(255,255,255,.62);margin-bottom:14px;line-height:1.8}
+p:last-child{margin-bottom:0}
+ul{margin:10px 0 16px;padding-left:0;list-style:none}
+ul li{font-size:15px;color:rgba(255,255,255,.62);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,.04)}
+ul li:last-child{border-bottom:none}
+ul li::before{content:'›';position:absolute;left:0;color:#00D084;font-size:16px;top:5px;font-weight:700}
+strong{color:rgba(255,255,255,.85)}
+a{color:#00C2FF;text-decoration:none}
+a:hover{text-decoration:underline}
+.data-table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+.data-table th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+.data-table td{padding:12px 14px;color:rgba(255,255,255,.62);border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table td:first-child{color:rgba(255,255,255,.85);font-weight:500}
+.parties-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.party-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:20px}
+.party-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+.party-box p{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:6px;line-height:1.6}
+.party-box p:last-child{margin:0}
+.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.sec-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:14px 16px}
+.sec-item .sec-icon{font-size:18px;margin-bottom:8px}
+.sec-item .sec-title{font-size:12px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:4px}
+.sec-item p{font-size:12px;color:rgba(255,255,255,.5);margin:0;line-height:1.5}
+.sig-box{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:32px 0;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:28px}
+.sig-party .sig-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.35);margin-bottom:12px}
+.sig-party p{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:6px}
+.sig-line{margin-top:24px;border-top:1px solid rgba(255,255,255,.1);padding-top:10px;font-size:12px;color:rgba(255,255,255,.25);font-style:italic}
+.contact-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:20px 24px;margin:16px 0}
+.contact-box p{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:8px}
+.contact-box p:last-child{margin-bottom:0}
+.footer-legal{margin-top:64px;padding-top:28px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-legal p{font-size:12px;color:rgba(255,255,255,.25);margin:0}
+@media(max-width:600px){.parties-grid,.security-grid,.sig-box{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="logo">Daltons<span>AI</span></div>
+  <a class="back" href="/">← Back to site</a>
+</nav>
+<div class="container">
+
+  <div class="badge">Legal Document</div>
+  <h1>Data Processing Agreement</h1>
+  <p class="meta">Daltons AI B.V. · KVK 97688835 · Amsterdam, Netherlands</p>
+  <div class="version">
+    <span class="vtag">Version 1.0</span>
+    <span class="vtag">Effective: 11 March 2026</span>
+    <span class="vtag">Last updated: 11 March 2026</span>
+    <span class="vtag">GDPR Article 28 Compliant</span>
+  </div>
+
+  <div class="intro-box">
+    <p>This Data Processing Agreement ("DPA") is entered into between Daltons AI B.V. as Processor and the subscribing Client as Controller. This DPA forms an integral part of the Daltons AI Terms of Service and is binding upon subscription to any Daltons AI plan.</p>
+    <p>This DPA is required by Article 28 of the EU General Data Protection Regulation (GDPR) 2016/679 and the Dutch UAVG. It applies to all personal data processed by Daltons AI on behalf of the Client in connection with the delivery of AI Lead Autopilot, AI Market Intelligence and AI Deal Operations services.</p>
+    <p><strong>Enterprise plan clients requiring a signed PDF copy of this DPA should contact legal@daltonsai.com.</strong></p>
+  </div>
+
+  <h2><span class="sec-num">01</span> Definitions</h2>
+  <p>In this DPA, the following definitions apply:</p>
+  <ul>
+    <li><strong>"Controller"</strong> means the Client — the party that determines the purposes and means of processing personal data.</li>
+    <li><strong>"Processor"</strong> means Daltons AI B.V. — the party that processes personal data on behalf of the Controller under this DPA.</li>
+    <li><strong>"Personal Data"</strong> means any information relating to an identified or identifiable natural person as defined in GDPR Article 4(1).</li>
+    <li><strong>"Processing"</strong> means any operation or set of operations performed on personal data, as defined in GDPR Article 4(2).</li>
+    <li><strong>"Data Subject"</strong> means an identified or identifiable natural person whose personal data is processed.</li>
+    <li><strong>"Sub-processor"</strong> means any third party engaged by Daltons AI to process personal data under this DPA.</li>
+    <li><strong>"Data Breach"</strong> means a breach of security leading to accidental or unlawful destruction, loss, alteration, unauthorised disclosure of or access to personal data.</li>
+    <li><strong>"SCCs"</strong> means Standard Contractual Clauses as adopted by the European Commission for international data transfers.</li>
+    <li><strong>"Services"</strong> means the AI Lead Autopilot, AI Market Intelligence and AI Deal Operations services as described in the Terms of Service.</li>
+  </ul>
+
+  <h2><span class="sec-num">02</span> The Parties</h2>
+  <div class="parties-grid">
+    <div class="party-box">
+      <div class="party-label">Processor (Daltons AI)</div>
+      <p><strong>Daltons AI B.V.</strong></p>
+      <p>KVK: 97688835</p>
+      <p>Amsterdam, Netherlands</p>
+      <p>legal@daltonsai.com</p>
+      <p>daltonsai.com</p>
+    </div>
+    <div class="party-box">
+      <div class="party-label">Controller (Client)</div>
+      <p><strong>The subscribing Client</strong></p>
+      <p>As identified in the Stripe billing account and subscription registration details</p>
+      <p>Accepted digitally upon subscription</p>
+    </div>
+  </div>
+
+  <h2><span class="sec-num">03</span> Subject Matter, Nature & Purpose</h2>
+  <table class="data-table">
+    <tr><th>Element</th><th>Details</th></tr>
+    <tr><td>Subject matter</td><td>Processing of personal data in connection with delivery of AI real estate automation services</td></tr>
+    <tr><td>Nature of processing</td><td>Collection, storage, enrichment, analysis, scoring, automated outreach and reporting</td></tr>
+    <tr><td>Purpose of processing</td><td>Lead generation and qualification; market monitoring and intelligence; deal pipeline automation on behalf of Client</td></tr>
+    <tr><td>Categories of data subjects</td><td>Real estate business professionals, property developers, investors, agency executives, decision-makers</td></tr>
+    <tr><td>Categories of personal data</td><td>Professional names, business email addresses, job titles, company names, company phone numbers, LinkedIn profile URLs, company size, geographic location, publicly available property transaction data</td></tr>
+    <tr><td>Special categories</td><td>None — no special category data (GDPR Art. 9) is collected or processed</td></tr>
+    <tr><td>Duration of processing</td><td>For the duration of the active subscription plus data retention periods as defined in the Privacy Policy</td></tr>
+  </table>
+
+  <h2><span class="sec-num">04</span> Processor Obligations (Daltons AI)</h2>
+  <p>Daltons AI B.V. agrees and warrants to:</p>
+  <ul>
+    <li>Process personal data only on documented instructions from the Controller, unless required to do so by Union or Member State law</li>
+    <li>Ensure all personnel authorised to process personal data are bound by enforceable confidentiality obligations</li>
+    <li>Implement and maintain appropriate technical and organisational security measures pursuant to GDPR Article 32 (see Section 08)</li>
+    <li>Assist the Controller in fulfilling its obligations to respond to data subject rights requests (access, erasure, portability, etc.) within the timeframes required by applicable law</li>
+    <li>Assist the Controller in ensuring compliance with GDPR Articles 32–36 (security, breach notification, DPIAs, prior consultation)</li>
+    <li>Delete or return all personal data to the Controller upon termination of the agreement, and delete existing copies unless Union or Member State law requires storage</li>
+    <li>Make available to the Controller all information necessary to demonstrate compliance with GDPR Article 28 obligations and allow for audits conducted by the Controller or its authorised auditor</li>
+    <li>Notify the Controller without undue delay after becoming aware of a personal data breach involving Controller's data (see Section 09)</li>
+    <li>Maintain a record of all processing activities carried out on behalf of the Controller as required by GDPR Article 30(2)</li>
+  </ul>
+
+  <h2><span class="sec-num">05</span> Controller Obligations (Client)</h2>
+  <p>The Controller agrees and warrants to:</p>
+  <ul>
+    <li>Ensure there is a valid and documented lawful basis under GDPR Article 6 for all personal data provided to or processed through Daltons AI</li>
+    <li>Ensure any outreach conducted using leads generated through the platform complies with applicable anti-spam, marketing and privacy laws in the recipients' jurisdictions</li>
+    <li>Provide accurate, complete and timely instructions for data processing activities</li>
+    <li>Notify Daltons AI promptly of any data subject requests, regulatory inquiries or complaints relating to data processed through the platform</li>
+    <li>Comply with all applicable data protection laws in the Client's jurisdiction and target markets</li>
+    <li>Inform Daltons AI of any specific data localisation requirements applicable to the Controller's jurisdiction</li>
+  </ul>
+
+  <h2><span class="sec-num">06</span> Sub-processors</h2>
+  <p>The Controller grants Daltons AI general written authorisation under GDPR Article 28(2) to engage the following sub-processors in the delivery of services:</p>
+  <table class="data-table">
+    <tr><th>Sub-processor</th><th>Country</th><th>Purpose</th><th>Transfer Safeguard</th></tr>
+    <tr><td>Anthropic PBC</td><td>USA</td><td>AI language model processing — lead scoring, report generation, content creation</td><td>SCCs (EU Commission 2021/914)</td></tr>
+    <tr><td>Vercel Inc.</td><td>USA</td><td>Platform hosting and content delivery</td><td>SCCs + DPA</td></tr>
+    <tr><td>Airtable Inc.</td><td>USA</td><td>Lead and client data storage, CRM database</td><td>SCCs + DPA</td></tr>
+    <tr><td>Apollo.io Inc.</td><td>USA</td><td>B2B lead sourcing, data enrichment</td><td>SCCs + DPA</td></tr>
+    <tr><td>Instantly.ai</td><td>USA</td><td>Automated email outreach delivery and sequencing</td><td>SCCs + DPA</td></tr>
+    <tr><td>n8n GmbH</td><td>Germany (EU)</td><td>Workflow automation — connecting all AI agents</td><td>GDPR-compliant (EU entity)</td></tr>
+    <tr><td>Stripe Inc.</td><td>USA</td><td>Subscription billing and payment processing</td><td>SCCs + DPA</td></tr>
+    <tr><td>Google LLC</td><td>USA</td><td>Google Maps API for lead geographic data</td><td>SCCs + DPA</td></tr>
+  </table>
+  <p>Daltons AI will inform the Controller of any intended changes to sub-processors (additions or replacements) with at least <strong>14 days' prior written notice</strong> by email. The Controller has the right to object to any new sub-processor within 7 days of notification. Where the Controller raises a reasonable objection, Daltons AI will work in good faith to find an alternative solution. All sub-processors are engaged under written agreements containing data protection obligations equivalent to those in this DPA.</p>
+
+  <h2><span class="sec-num">07</span> International Data Transfers</h2>
+  <p>Where personal data is transferred outside the European Economic Area (EEA), Daltons AI ensures appropriate safeguards are in place pursuant to GDPR Chapter V, including:</p>
+  <ul>
+    <li><strong>Standard Contractual Clauses (SCCs):</strong> EU Commission Implementing Decision 2021/914 (Module 2: Controller to Processor, and Module 3: Processor to Processor) are incorporated by reference into contracts with all US-based sub-processors</li>
+    <li><strong>Transfer Impact Assessments (TIAs):</strong> Completed for all US-based sub-processors to ensure an equivalent level of protection is maintained</li>
+    <li><strong>Supplementary measures:</strong> Including encryption in transit and at rest, access controls, and pseudonymisation where technically feasible, implemented in accordance with EDPB Recommendations 01/2020</li>
+    <li><strong>UK transfers:</strong> UK International Data Transfer Agreements (IDTAs) used for transfers to/from UK-based services where applicable post-Brexit</li>
+  </ul>
+
+  <h2><span class="sec-num">08</span> Security Measures (GDPR Article 32)</h2>
+  <p>Daltons AI implements the following technical and organisational measures to ensure a level of security appropriate to the risk:</p>
+  <div class="security-grid">
+    <div class="sec-item">
+      <div class="sec-icon">🔐</div>
+      <div class="sec-title">Encryption</div>
+      <p>TLS 1.2+ for all data in transit. AES-256 encryption for all data at rest. End-to-end encryption for sensitive client data.</p>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🔑</div>
+      <div class="sec-title">Access Controls</div>
+      <p>Role-based access control (RBAC). Multi-factor authentication (MFA) enforced for all staff. Principle of least privilege applied.</p>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🛡️</div>
+      <div class="sec-title">Infrastructure Security</div>
+      <p>Hosted on Vercel with enterprise-grade security. Regular automated vulnerability scanning. DDoS protection enabled.</p>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">📋</div>
+      <div class="sec-title">Organisational Measures</div>
+      <p>Staff confidentiality agreements. Annual data protection training. Clear desk and screen lock policies enforced.</p>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">🔍</div>
+      <div class="sec-title">Monitoring & Logging</div>
+      <p>Security event logging with 12-month retention. Real-time anomaly detection. Intrusion detection systems active.</p>
+    </div>
+    <div class="sec-item">
+      <div class="sec-icon">♻️</div>
+      <div class="sec-title">Business Continuity</div>
+      <p>Daily automated backups with 30-day retention. Disaster recovery procedures tested quarterly. RTO: 4 hours. RPO: 24 hours.</p>
+    </div>
+  </div>
+
+  <h2><span class="sec-num">09</span> Data Breach Notification</h2>
+  <p>In the event of a personal data breach involving data processed under this DPA:</p>
+  <ul>
+    <li>Daltons AI will notify the Controller <strong>within 48 hours</strong> of becoming aware of the breach — this is stricter than the GDPR 72-hour supervisory authority requirement to give the Controller time to assess and report</li>
+    <li>Notification will be sent to the email address registered on the Controller's account</li>
+    <li>Initial notification will include at minimum: the nature and extent of the breach, estimated number of data subjects affected, categories of data involved, and immediate containment measures taken</li>
+    <li>Daltons AI will provide a full incident report within 5 business days including root cause analysis and remediation measures</li>
+    <li>Daltons AI will cooperate fully with the Controller in complying with its own notification obligations to the Autoriteit Persoonsgegevens and/or affected data subjects</li>
+    <li>Daltons AI will document all breaches regardless of whether they meet the threshold for notification to supervisory authorities</li>
+  </ul>
+
+  <h2><span class="sec-num">10</span> Data Subject Rights Assistance</h2>
+  <p>Daltons AI will assist the Controller in responding to data subject rights requests under GDPR Articles 15–22. Specifically:</p>
+  <ul>
+    <li>Client portal provides self-service tools to export all lead data in CSV format within 24 hours of request</li>
+    <li>Permanent deletion of any individual's data can be completed within <strong>5 business days</strong> of a documented request from the Controller</li>
+    <li>Any data subject requests received directly by Daltons AI will be forwarded to the Controller immediately, with no direct response to the data subject except to acknowledge receipt</li>
+    <li>Full audit trail of all processing activities for a given data subject is available to Enterprise plan clients upon request</li>
+  </ul>
+
+  <h2><span class="sec-num">11</span> Audit Rights</h2>
+  <p>The Controller has the right to conduct, or commission an independent auditor to conduct, an audit of Daltons AI's data processing activities and security measures. The following conditions apply:</p>
+  <ul>
+    <li>Written notice of at least <strong>30 days</strong> must be provided before any audit</li>
+    <li>Audits may be conducted no more than once per calendar year (unless triggered by a confirmed data breach)</li>
+    <li>The Controller bears the cost of any third-party auditor engaged</li>
+    <li>Daltons AI may fulfil audit obligations by providing current third-party security certifications or audit reports (e.g. SOC 2 Type II, ISO 27001) where available</li>
+    <li>Audit activities must not unreasonably disrupt Daltons AI's business operations or compromise the security of other clients</li>
+  </ul>
+
+  <h2><span class="sec-num">12</span> Data Return & Deletion</h2>
+  <p>Upon termination or expiry of the subscription, at the Controller's choice and within 30 days of termination:</p>
+  <ul>
+    <li><strong>Return:</strong> Daltons AI will provide a full export of all Client data in CSV format via the client portal or secure file transfer</li>
+    <li><strong>Deletion:</strong> Daltons AI will delete all personal data processed on behalf of the Controller from its systems and from sub-processors' systems, with written confirmation of deletion provided within 10 business days</li>
+    <li>Daltons AI may retain data for longer only where required by applicable law (e.g. Dutch tax records retention), and will notify the Controller of any such retained data and its legal basis</li>
+  </ul>
+
+  <h2><span class="sec-num">13</span> Governing Law & Disputes</h2>
+  <p>This DPA is governed by the laws of the Netherlands. The competent courts of Amsterdam, the Netherlands, have exclusive jurisdiction over any disputes arising from this DPA. In the event of any conflict between this DPA and the Terms of Service, the provisions of this DPA shall prevail with respect to the processing of personal data.</p>
+
+  <h2><span class="sec-num">14</span> Agreement & Execution</h2>
+  <p>By subscribing to any Daltons AI service plan, the Controller confirms acceptance of this Data Processing Agreement as a legally binding contract pursuant to GDPR Article 28.</p>
+  <p>Enterprise clients requiring a physically or digitally signed copy of this DPA (e.g. for compliance with their own internal policies) should contact <a href="mailto:legal@daltonsai.com">legal@daltonsai.com</a>. We will provide a countersigned PDF within 3 business days.</p>
+
+  <div class="sig-box">
+    <div class="sig-party">
+      <div class="sig-label">Processor</div>
+      <p><strong>Daltons AI B.V.</strong></p>
+      <p>KVK: 97688835</p>
+      <p>Amsterdam, Netherlands</p>
+      <p>legal@daltonsai.com</p>
+      <p>daltonsai.com</p>
+      <div class="sig-line">Authorised signatory on file · Available upon request</div>
+    </div>
+    <div class="sig-party">
+      <div class="sig-label">Controller</div>
+      <p><strong>Client</strong></p>
+      <p>As identified in Stripe billing account and subscription registration</p>
+      <p>Accepted digitally upon subscription to any Daltons AI plan</p>
+      <div class="sig-line">Digital acceptance upon subscription · Date recorded in system</div>
+    </div>
+  </div>
+
+  <div class="footer-legal">
+    <p>Daltons AI B.V. · KVK 97688835 · Amsterdam, Netherlands</p>
+    <p>Version 1.0 · Effective 11 March 2026 · GDPR Article 28 Compliant</p>
+  </div>
+
+</div>
+</body>
+</html>
