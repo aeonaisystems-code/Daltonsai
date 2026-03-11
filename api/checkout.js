@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       cancel_url: `https://daltonsai.com?payment=cancelled`,
       locale: 'nl',
       billing_address_collection: 'required',
-      payment_method_types: ['card', 'ideal', 'bancontact'],
+      payment_method_types: ['card'],
       metadata: { plan: planName }
     });
 
