@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — DaltonsAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#040407;--bg2:#0a0b12;--bg3:#12131e;--cy:#00E5FF;--gd:#FFAB00;--wh:#eeeef2;--gr:#5a5c70;--hd:'Clash Display',sans-serif;--bd:'Satoshi',sans-serif}
+body{background:var(--bg);color:var(--wh);font-family:var(--bd);font-weight:300;min-height:100vh}
+.top{padding:16px 24px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:var(--hd);font-weight:700;font-size:20px}.logo b{color:var(--cy)}
+.top a{color:var(--gr);font-size:13px}
+.login-box{max-width:400px;margin:120px auto;padding:40px;background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:16px;text-align:center}
+.login-box h2{font-family:var(--hd);font-size:24px;margin-bottom:8px}
+.login-box p{color:var(--gr);font-size:14px;margin-bottom:24px}
+.login-box input{width:100%;padding:14px 16px;background:var(--bg);border:1px solid rgba(255,255,255,.06);border-radius:10px;color:var(--wh);font-size:14px;font-family:var(--bd);outline:none;margin-bottom:12px}
+.login-box input:focus{border-color:var(--cy)}
+.login-box button{width:100%;padding:14px;background:var(--cy);color:var(--bg);border:none;border-radius:100px;font-weight:700;font-size:14px;cursor:pointer}
+.login-box button:hover{box-shadow:0 4px 20px rgba(0,229,255,.25)}
+.dash{display:none;padding:24px;max-width:1100px;margin:0 auto}
+.dash-header{margin-bottom:32px}
+.dash-header h1{font-family:var(--hd);font-size:28px;font-weight:700}
+.dash-header p{color:var(--gr);font-size:14px;margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.stat{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:12px;padding:20px}
+.stat-val{font-family:var(--hd);font-size:28px;font-weight:700;color:var(--cy)}
+.stat-label{font-size:12px;color:var(--gr);margin-top:2px}
+.leads-table{width:100%;border-collapse:collapse;background:var(--bg2);border-radius:12px;overflow:hidden}
+.leads-table th{text-align:left;padding:12px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gr);border-bottom:1px solid rgba(255,255,255,.04)}
+.leads-table td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.02)}
+.score-badge{display:inline-block;padding:2px 10px;border-radius:100px;font-weight:700;font-size:11px}
+.score-hot{background:rgba(0,229,255,.1);color:var(--cy)}.score-warm{background:rgba(255,171,0,.1);color:var(--gd)}.score-cold{background:rgba(90,92,112,.2);color:var(--gr)}
+.empty{text-align:center;padding:60px;color:var(--gr)}
+@media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}.leads-table{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="top"><a href="/" class="logo">Daltons<b>AI</b></a><a href="/">← Back to site</a></div>
+<div class="login-box" id="login">
+<h2>Client Dashboard</h2>
+<p>Enter your email to view your leads</p>
+<input type="email" id="email" placeholder="your@email.com" onkeypress="if(event.key==='Enter')login()">
+<button onclick="login()">View My Leads →</button>
+</div>
+<div class="dash" id="dash">
+<div class="dash-header"><h1 id="welcome">Welcome back</h1><p id="plan-info">Loading...</p></div>
+<div class="stats">
+<div class="stat"><div class="stat-val" id="s-delivered">-</div><div class="stat-label">Leads Delivered</div></div>
+<div class="stat"><div class="stat-val" id="s-limit">-</div><div class="stat-label">Monthly Limit</div></div>
+<div class="stat"><div class="stat-val" id="s-hot">-</div><div class="stat-label">Hot Leads (70+)</div></div>
+<div class="stat"><div class="stat-val" id="s-avg">-</div><div class="stat-label">Avg Score</div></div>
+</div>
+<table class="leads-table"><thead><tr><th>Name</th><th>Company</th><th>Title</th><th>Score</th><th>Status</th><th>City</th></tr></thead><tbody id="leads-body"><tr><td colspan="6" class="empty">Loading leads...</td></tr></tbody></table>
+</div>
+<script>
+const SB='https://dbwkixrjvhiiinrziiwk.supabase.co/rest/v1';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRid2tpeHJqdmhpaWlucnppaXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NDQ2OTgsImV4cCI6MjA4ODAyMDY5OH0.ysz1RxZcDq2Od0cbpWtfQqXTPAs9TKdfbDEMk9raqzM';
+const h={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
+async function login(){
+const email=document.getElementById('email').value.trim();if(!email)return;
+try{
+const r=await fetch(SB+'/client_accounts?email=eq.'+encodeURIComponent(email),{headers:h});
+const clients=await r.json();
+if(!clients.length){alert('No account found for this email. Contact hello@daltonsai.com');return}
+const client=clients[0];
+document.getElementById('login').style.display='none';
+document.getElementById('dash').style.display='block';
+document.getElementById('welcome').textContent='Welcome, '+client.company;
+document.getElementById('plan-info').textContent=client.plan.charAt(0).toUpperCase()+client.plan.slice(1)+' Plan · '+client.leads_delivered+'/'+client.lead_limit+' leads this month';
+// Fetch leads
+const lr=await fetch(SB+'/delivered_leads?client_id=eq.'+client.id+'&order=delivered_at.desc',{headers:h});
+const leads=await lr.json();
+document.getElementById('s-delivered').textContent=leads.length;
+document.getElementById('s-limit').textContent=client.lead_limit;
+document.getElementById('s-hot').textContent=leads.filter(l=>l.score>=70).length;
+document.getElementById('s-avg').textContent=leads.length?Math.round(leads.reduce((a,l)=>a+l.score,0)/leads.length):'-';
+const tb=document.getElementById('leads-body');
+if(!leads.length){tb.innerHTML='<tr><td colspan="6" class="empty">No leads delivered yet. The Daltons are hunting! 🤠</td></tr>';return}
+tb.innerHTML=leads.map(l=>`<tr><td>${l.name||'-'}</td><td>${l.company||'-'}</td><td>${l.title||'-'}</td><td><span class="score-badge ${l.score>=70?'score-hot':l.score>=40?'score-warm':'score-cold'}">${l.score}</span></td><td>${l.outreach_status||'pending'}</td><td>${l.city||'-'}</td></tr>`).join('');
+}catch(e){alert('Error loading dashboard. Try again.')}
+}
+</script>
+</body>
+</html>
